@@ -31,3 +31,8 @@ def error_sin_documentos_en_la_base_de_datos(dato, base_de_datos):
         status_code=status.HTTP_409_CONFLICT, 
         detail=f"El dato {dato} no fue encontrado en la base de datos {base_de_datos} con ningun documentos, por ende no podemos dar retorno por sobre el mismo.")
     
+def error_carga_repetida_un_solo_dato(dato, base_de_datos):
+    raise HTTPException(
+     status_code=status.HTTP_409_CONFLICT,
+     detail=f"El dato ingresado {dato} se encuentra repetido en la carga enviada. Ingrese nuevamente los datos para la carga de: {base_de_datos}"   
+    )
