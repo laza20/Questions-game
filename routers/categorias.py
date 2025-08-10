@@ -21,3 +21,11 @@ peticiones_http_post.cargar_uno(
     categoria_schema,
     validar_categorias.validacion_carga_categoria
 )
+
+peticiones_http_post.cargar_muchos(
+    Categoria,
+    router,
+    base_de_datos,
+    categorias_schema,
+    validar_categorias.validacion_carga_categoria
+)
