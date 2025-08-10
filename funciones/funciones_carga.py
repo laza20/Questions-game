@@ -7,10 +7,15 @@ from funciones import funciones_logicas
 def logica_de_carga_normal(dato, base_de_datos):
         dict_dato = dict(dato)
         dict_dato["tipo"] = base_de_datos
-        if dict_dato.get("temporada", "") != "":
-            dict_dato["temporada"] = funciones_logicas.validate_object_id(dict_dato["temporada"])
-        
         return dict_dato
+    
+def cargar_uno(dato, base_de_datos, schema, validacion):
+        coleccion = getattr(db_client, base_de_datos)
+        validacion(dato, base_de_datos)
+        dict_dato = logica_de_carga_normal(dato, base_de_datos)
+        id = coleccion.insert_one(dict_dato).inserted_id
+        new_formato = schema(coleccion.find_one({"_id":id}))
+        return new_formato
     
     
 #Funcion para cargar un muchos documentos que no sean circuito_por_temporada, piloto_por_temporada, Equipo_por_temporada.
