@@ -1,5 +1,5 @@
 # pyright: reportInvalidTypeForm=false
-from funciones import funciones_carga, funcion_carga_carrera
+from funciones import funciones_carga
 from fastapi import status, Body
 from pydantic import BaseModel
 from typing import Type, Any, List
