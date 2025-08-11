@@ -1,0 +1,31 @@
+from fastapi import APIRouter
+from db.models.sub_categoria import SubCategoria
+from db.schemas.sub_categoria import sub_categoria_schema,sub_categorias_schema
+from peticiones_http import (
+    peticiones_http_post
+)
+from validaciones import validar_sub_categoria
+
+
+
+router = APIRouter(prefix="/Sub/Categoria",
+                   tags=["SUB CATEGORIA"],
+                   responses={404:{"Message":"No encontrado"}}
+)
+base_de_datos = "Sub_categoria"
+
+peticiones_http_post.cargar_uno(
+    SubCategoria,
+    router,
+    base_de_datos,
+    sub_categoria_schema,
+    validar_sub_categoria.validacion_carga_sub_categoria
+)
+
+peticiones_http_post.cargar_muchos(
+    SubCategoria,
+    router,
+    base_de_datos,
+    sub_categorias_schema,
+    validar_sub_categoria.validacion_carga_sub_categoria
+)
