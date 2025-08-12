@@ -14,7 +14,7 @@ def validacion_carga_sub_categoria(datos, base_de_datos):
             sub_categoria_descripcion.add(key_2)   
     else:
         dato = datos if not isinstance(datos, list) else datos[0]
-        key = validacion_carga_sub_categoria_2(dato, base_de_datos)
+        key, key_2 = validacion_carga_sub_categoria_2(dato, base_de_datos)
             
 def validar_carga_repetida(key,key_2, sub_categoria_nombre,sub_categoria_descripcion, dato, base_de_datos):
     if key in sub_categoria_nombre:
