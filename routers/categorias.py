@@ -36,3 +36,11 @@ peticiones_http_get.view_old_data(
     base_de_datos, 
     Categoria, 
     categorias_schema)
+
+lista_de_propiedades = ["nombre_categoria", "descripcion"] 
+peticiones_http_get.view_one_document_for_data_str(
+    router, 
+    base_de_datos, 
+    categoria_schema, 
+    lista_de_propiedades
+    )

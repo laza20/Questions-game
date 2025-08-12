@@ -36,3 +36,11 @@ peticiones_http_get.view_old_data(
     base_de_datos, 
     NanoCategoria, 
     nano_categorias_schema)
+
+lista_de_propiedades = ["nombre", "descripcion"] 
+peticiones_http_get.view_one_document_for_data_str(
+    router, 
+    base_de_datos, 
+    nano_categoria_schema, 
+    lista_de_propiedades
+    )

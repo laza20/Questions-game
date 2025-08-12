@@ -37,3 +37,11 @@ peticiones_http_get.view_old_data(
     MicroCategoria, 
     micro_categorias_schema
     )
+
+lista_de_propiedades = ["nombre", "descripcion"] 
+peticiones_http_get.view_one_document_for_data_str(
+    router, 
+    base_de_datos, 
+    micro_categoria_schema, 
+    lista_de_propiedades
+    )
