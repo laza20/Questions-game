@@ -1,5 +1,5 @@
 from fastapi import HTTPException, status
-from validaciones_generales import validaciones_simples
+from validaciones_generales import validaciones_simples, validaciones_dobles
 from errores_generales import errores_simples
 
 
@@ -25,7 +25,7 @@ def validar_carga_repetida(key,key_2, sub_categoria_nombre,sub_categoria_descrip
             
 def validacion_carga_micro_categoria_2(dato, base_de_datos):
     key, key_2 = create_key(dato)
-    validaciones_simples.validacion_simple_general(base_de_datos, dato.nombre)
+    validaciones_dobles.validacion_doble_general(base_de_datos, dato.nombre, dato.sub_categoria)
     validaciones_simples.validacion_simple_general(base_de_datos, dato.descripcion)
     validaciones_simples.validacion_simple_general_negativa("Sub_categoria", dato.sub_categoria)
     return key, key_2
