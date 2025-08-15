@@ -2,6 +2,7 @@ from fastapi import HTTPException, status
 from db.client import db_client
 from validaciones_generales import validaciones_simples, validaciones_dobles
 from errores_generales import errores_simples
+from funciones import funcion_carga_questions
 
 
 
@@ -24,7 +25,15 @@ def validar_carga_repetida(key, questions, dato, base_de_datos):
 def validacion_carga_question_2(dato, base_de_datos, coleccion):
     key = create_key(dato)
     validaciones_simples.validacion_simple_general(base_de_datos, dato.pregunta)
+    validar_cantidad_de_opciones(dato)
     return key
+
+def validar_cantidad_de_opciones(dato):
+    opciones = 0
+    for opcion in dato.opciones:
+        opciones += 1 
+    if opciones > 4:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="No puede ingresar mas de 4 opciones")
 
 def create_key(dato):
     key = (dato.pregunta.lower())   
