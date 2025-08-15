@@ -31,6 +31,13 @@ def validar_y_obtener_jerarquia_de_categoria(categoria_data: dict):
     
     
     filtro = {}
+    if nano_categoria and not micro_categoria:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"Acaba de ingresar una nano categoria, debe ingresar su micro categoria de manera obligatoria.")
+    
+    if not db_client.Nano_categoria.find_one({"nombre":{"$regex": f"^{nano_categoria}$", "$options": "i"}}):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"La nano categoria que acaba de ingresar no existe en la base de datos.")
+    
+    
     if nano_categoria and micro_categoria and not sub_categoria:
         filtro.update(obtener_datos_por_micro_categoria(micro_categoria))
         filtro["nano_categoria"]  = nano_categoria
@@ -59,7 +66,7 @@ def validar_y_obtener_jerarquia_de_categoria(categoria_data: dict):
 
 
 def obtener_categoria(sub_categoria):
-    sub_categoria_data = db_client.Sub_categoria.find_one({"nombre": sub_categoria})
+    sub_categoria_data = db_client.Sub_categoria.find_one({"nombre": {"$regex": f"^{sub_categoria}$", "$options": "i"}})
     
     if not sub_categoria_data:
         raise HTTPException(status_code=404, detail=f"Sub_categoria '{sub_categoria}' no encontrada")
@@ -71,7 +78,7 @@ def obtener_categoria(sub_categoria):
     
 
 def obtener_datos_por_micro_categoria(micro_categoria):
-    dict_micro_categoria = db_client.Micro_categoria.find_one({"nombre": micro_categoria})
+    dict_micro_categoria = db_client.Micro_categoria.find_one({"nombre": {"$regex": f"^{micro_categoria}$", "$options": "i"}})
     if not dict_micro_categoria:
         raise HTTPException(status_code=404, detail=f"Micro_categoria '{micro_categoria}' no encontrada")
 
