@@ -15,7 +15,14 @@ router = APIRouter(prefix="/Preguntas",
 )
 base_de_datos = "Preguntas"
 
-peticiones_http_post.realizar_carga(
+peticiones_http_post.realizar_carga_unitaria(
+    Question,
+    router,
+    base_de_datos,
+    validar_questions.validacion_carga_question
+)
+
+peticiones_http_post.realizar_carga_masiva(
     Question,
     router,
     base_de_datos,
