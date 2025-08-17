@@ -13,9 +13,16 @@ def cargar_uno(Clase: Type[BaseModel], router, base_de_datos, schema, validacion
     
         return new_document
     
-def realizar_carga(Clase: Type[BaseModel], router, base_de_datos:str, validacion):
+def realizar_carga_unitaria(Clase: Type[BaseModel], router, base_de_datos:str, validacion):
     @router.post("/Cargar/Uno", status_code=status.HTTP_201_CREATED)
     async def create_one(clase: Clase = Body(...)):
+        new_document = funcion_carga_questions.cargar_documentos(clase, base_de_datos, validacion)
+    
+        return new_document
+    
+def realizar_carga_masiva(Clase: Type[BaseModel], router, base_de_datos:str, validacion):
+    @router.post("/Cargar/Muchos", status_code=status.HTTP_201_CREATED)
+    async def create_one(clase: List[Clase] = Body(...)):
         new_document = funcion_carga_questions.cargar_documentos(clase, base_de_datos, validacion)
     
         return new_document
