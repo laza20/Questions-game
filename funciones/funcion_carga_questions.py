@@ -114,6 +114,7 @@ def cargar_documentos(datos, base_de_datos, validacion):
         dict_dato["categoria"] = validar_y_obtener_jerarquia_de_categoria(dict_dato["categoria"])
         # Agregamos los campos del sistema
         dict_dato.update({
+            "puntos": 500,
             "usuario_carga": "usuario_autenticado", 
             "fecha_carga": datetime.now(),
             "tipo" : base_de_datos,
