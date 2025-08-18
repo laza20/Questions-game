@@ -2,18 +2,6 @@ import random
 from db.client import db_client
 from fastapi import HTTPException, status
 
-#Sirve para cuando se quiere jugar a una categoria sola.
-def aleatorizar_preguntas_de_una_categoria():
-    nivel_elegido = aleatorizar_niveles()
-    return nivel_elegido
-
-
-#Sirve para cuando se quiere jugar en todas las categorias.
-def aleatorizar_preguntas_generales():
-    categoria_elegida = aleatorizar_categorias_generales()
-    nivel_elegido     = aleatorizar_niveles()
-    
-    return nivel_elegido, categoria_elegida
 
 def aleatorizar_pregunta(base_de_datos, schema):
     nivel_elegido, categoria_elegida = aleatorizar_preguntas_generales()
@@ -26,6 +14,19 @@ def aleatorizar_pregunta(base_de_datos, schema):
     
     pregunta_elegida = random.choice(documentos)
     return pregunta_elegida
+
+#Sirve para cuando se quiere jugar a una categoria sola.
+def aleatorizar_preguntas_de_una_categoria():
+    nivel_elegido = aleatorizar_niveles()
+    return nivel_elegido
+
+
+#Sirve para cuando se quiere jugar en todas las categorias.
+def aleatorizar_preguntas_generales():
+    categoria_elegida = aleatorizar_categorias_generales()
+    nivel_elegido     = aleatorizar_niveles()
+    
+    return nivel_elegido, categoria_elegida
 
 
 def aleatorizar_niveles():
