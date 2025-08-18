@@ -115,6 +115,7 @@ def cargar_documentos(datos, base_de_datos, validacion):
         # Agregamos los campos del sistema
         dict_dato.update({
             "puntos": 500,
+            "consecutiva":0,
             "usuario_carga": "usuario_autenticado", 
             "fecha_carga": datetime.now(),
             "tipo" : base_de_datos,
