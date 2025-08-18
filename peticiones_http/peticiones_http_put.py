@@ -9,7 +9,7 @@ from funciones import funcion_nivel_pregunta, funciones_logicas
 from db.schemas.questions import many_request_schema
 
 def agregar_puntos(router, base_de_datos, schema):
-    @router.put("/Agregar/Puntos", response_model = list[QuestionRequest], status_code=status.HTTP_202_ACCEPTED)
+    @router.put("/Inicializar/Puntos", response_model = list[QuestionRequest], status_code=status.HTTP_202_ACCEPTED)
     async def user():
         coleccion = getattr(db_client, base_de_datos)
         lista_documentos = []
