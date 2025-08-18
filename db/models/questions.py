@@ -14,13 +14,16 @@ class Question(BaseModel):
     opciones: List[str]
     respuesta_correcta: str
     categoria: Category  # Aquí la jerarquía es un modelo anidado
+    puntos_pregunta : Optional[int] = None
+    nivel  : Optional[str] = None
     usuario_carga: str
     fecha_carga: Optional[datetime] = None
-    tipo: Optional[datetime] = None
+    tipo: Optional[str] = None
     estado: bool
 
 class QuestionRequest(BaseModel):
-    pregunta: str
-    opciones: List[str]
+    pregunta          : str
+    opciones          : List[str]
     respuesta_correcta: str
-    categoria: Dict[str, Optional[str]]
+    nivel             : str
+    categoria         : Dict[str, Optional[str]]
