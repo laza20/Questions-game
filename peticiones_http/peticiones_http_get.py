@@ -7,6 +7,7 @@ from typing import Type, List
 from funciones import funciones_logicas
 from fastapi import  HTTPException, status
 from bson import ObjectId
+from funciones import funciones_randoms
 
 
 
@@ -27,3 +28,10 @@ def view_one_document_for_data_str(router, base_de_datos, schema, lista_de_propi
         
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
             detail="No se encontro ningun documento con ese dato")  
+        
+        
+def jugar_categorias_generales(router, base_de_datos, schema, Clase: Type[BaseModel]):
+    @router.get("/Jugar/Categoria/General", response_model=Clase)
+    async def plays_game():
+        question = funciones_randoms.jugar_preguntas_generales(base_de_datos, schema)
+        return question

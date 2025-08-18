@@ -3,14 +3,15 @@ from db.client import db_client
 from fastapi import HTTPException, status
 
 
-def aleatorizar_pregunta(base_de_datos, schema):
+def jugar_preguntas_generales(base_de_datos, schema):
     nivel_elegido, categoria_elegida = aleatorizar_preguntas_generales()
     coleccion = getattr(db_client, base_de_datos)
-    documentos = schema(coleccion.find({"nivel":nivel_elegido, "categoria":categoria_elegida}))
+    documentos = list(coleccion.find({"nivel":{"$regex": f"^{nivel_elegido}$", "$options": "i"}, 
+                    "categoria.categoria": {"$regex": f"^{categoria_elegida}$", "$options": "i"}}))
     
     #Momentaneo, en una actualizacion pronta pienso implementar una funcion recursiva que vuelva a buscar otros filtros.
     if not documentos:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="No hay documentos de este tipo.")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"No hay {base_de_datos}-{categoria_elegida}-{nivel_elegido} documentos de este tipo.")
     
     pregunta_elegida = random.choice(documentos)
     return pregunta_elegida
