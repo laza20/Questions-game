@@ -48,3 +48,9 @@ peticiones_http_put.modificar_puntos_by_id(
     base_de_datos, 
     question_schema
 )
+
+peticiones_http_get.jugar_categorias_generales(
+    router, 
+    base_de_datos, 
+    question_schema, 
+    Question)
