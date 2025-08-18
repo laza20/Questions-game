@@ -16,6 +16,7 @@ class Question(BaseModel):
     categoria: Category  # Aquí la jerarquía es un modelo anidado
     puntos_pregunta : Optional[int] = None
     nivel  : Optional[str] = None
+    consecutiva : Optional[int] = None
     usuario_carga: str
     fecha_carga: Optional[datetime] = None
     tipo: Optional[str] = None
