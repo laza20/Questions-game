@@ -18,7 +18,8 @@ def agregar_puntos(router, base_de_datos, schema):
         for documento in documentos:
             dict_documento = documento
             dict_documento["puntos_pregunta"] = 500
-            dict_documento["nivel"]  = funcion_nivel_pregunta.cargar_nivel_pregunta(dict_documento["puntos"])
+            dict_documento["nivel"]  = funcion_nivel_pregunta.cargar_nivel_pregunta(dict_documento["puntos_pregunta"])
+            dict_documento["consecutiva"] = 0
             id = dict_documento["id"]
             oid = funciones_logicas.validate_object_id(id)
             coleccion.find_one_and_replace({"_id":oid}, dict_documento)
