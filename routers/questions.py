@@ -41,3 +41,10 @@ peticiones_http_put.agregar_puntos(
     router, 
     base_de_datos, 
     many_question_schema)
+
+
+peticiones_http_put.modificar_puntos_by_id(
+    router, 
+    base_de_datos, 
+    question_schema
+)
