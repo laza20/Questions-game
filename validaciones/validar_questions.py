@@ -3,6 +3,7 @@ from db.client import db_client
 from validaciones_generales import validaciones_simples, validaciones_dobles
 from errores_generales import errores_simples
 from funciones import funcion_carga_questions
+import re
 
 
 
@@ -24,7 +25,12 @@ def validar_carga_repetida(key, questions, dato, base_de_datos):
             
 def validacion_carga_question_2(dato, base_de_datos, coleccion):
     key = create_key(dato)
-    validaciones_simples.validacion_simple_general(base_de_datos, dato.pregunta)
+    pattern = f"^{re.escape(dato.pregunta.strip())}$"
+    if db_client.Preguntas.find_one({"pregunta": {"$regex": pattern, "$options": "i"}}):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, 
+            detail=f"Pregunta ya existente: {dato.pregunta}"
+        )
     validar_cantidad_de_opciones(dato)
     return key
 
