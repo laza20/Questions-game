@@ -46,8 +46,22 @@ def view_names_sub_categories(router, base_de_datos, schema):
     
         
         
-def jugar_categorias_generales(router, base_de_datos, schema, Clase: Type[BaseModel]):
-    @router.get("/Jugar/Categoria/General", response_model=Clase)
-    async def plays_game():
+def view_question_random(router, base_de_datos, schema, Clase: Type[BaseModel]):
+    @router.get("/Ver/Pregunta/Random/General", response_model=Clase)
+    async def view_question_random():
         question = funciones_randoms.jugar_preguntas_generales(base_de_datos)
         return question
+    
+    
+def play_question_general_random(router, base_de_datos):
+    @router.get("/Jugar/Pregunta/Random/General")
+    async def play_question_random():
+        dict_question = {}
+        question = funciones_randoms.jugar_preguntas_generales(base_de_datos)
+        dict_question = {
+            "pregunta": question["pregunta"],
+            "opciones":question["opciones"],
+            "respuesta_correcta":question["respuesta_correcta"],
+            "nivel":question["nivel"]
+        }
+        return dict_question
