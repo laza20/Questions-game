@@ -61,6 +61,11 @@ peticiones_http_get.play_question_general_random(
     base_de_datos, 
 )
 
+peticiones_http_get.play_question_category(
+    router, 
+    base_de_datos
+)
+
 peticiones_http_delete.delete_old_by_type(
     router, 
     base_de_datos
