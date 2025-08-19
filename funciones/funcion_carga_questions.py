@@ -7,6 +7,7 @@ from db.models.questions import Question as QuestionDB
 from db.schemas.questions import question_schema, schema_request
 from datetime import datetime
 from validaciones import validar_questions
+from funciones import funcion_nivel_pregunta
 
 # --- Funciones de Lógica de Negocio ---
 def validar_y_obtener_jerarquia_de_categoria(categoria_data: dict):
@@ -105,7 +106,6 @@ def cargar_documentos(datos, base_de_datos, validacion):
     lista_documentos = datos if es_lista else [datos]
     
     documentos_a_insertar = []
-    validacion(lista_documentos, base_de_datos)
     for dato in lista_documentos:
         
         dict_dato = dato.model_dump()
@@ -113,18 +113,12 @@ def cargar_documentos(datos, base_de_datos, validacion):
         # Validamos y obtenemos la jerarquía en una sola llamada
         dict_dato["categoria"] = validar_y_obtener_jerarquia_de_categoria(dict_dato["categoria"])
         # Agregamos los campos del sistema
-        dict_dato.update({
-            "puntos": 500,
-            "consecutiva":0,
-            "usuario_carga": "usuario_autenticado", 
-            "fecha_carga": datetime.now(),
-            "tipo" : base_de_datos,
-            "estado": True
-        })
-        del dict_dato["id"]
+        dict_dato = verificar_puntos_preg(dato, dict_dato)
+        nivel = funcion_nivel_pregunta.cargar_nivel_pregunta(dict_dato["puntos_pregunta"])
+        dict_dato = conformar_dict(dict_dato, nivel, base_de_datos)
         documentos_a_insertar.append(dict_dato)
         
-    
+    validacion(lista_documentos, base_de_datos)
     # Insertamos en la base de datos de forma eficiente
     if es_lista:
         resultado = coleccion.insert_many(documentos_a_insertar)
@@ -134,3 +128,29 @@ def cargar_documentos(datos, base_de_datos, validacion):
         id = coleccion.insert_one(documentos_a_insertar[0]).inserted_id
         documentos_insertados = coleccion.find_one({"_id": id})
         return schema_request(documentos_insertados)
+    
+    
+def verificar_puntos_preg(dato, dict_dato):
+    if dato.puntos_pregunta != None:
+        dict_dato.update({
+            "puntos_pregunta": dato.puntos_pregunta
+        })
+    else:
+        dict_dato.update({
+            "puntos_pregunta": 500
+        })
+    
+    return dict_dato
+
+
+def conformar_dict(dict_dato, nivel, base_de_datos):
+    dict_dato.update({
+        "nivel" : nivel,
+        "consecutiva":0,
+        "usuario_carga": "Master", 
+        "fecha_carga": datetime.now(),
+        "tipo" : base_de_datos,
+        "estado": True
+    })
+    del dict_dato["id"]
+    return dict_dato
