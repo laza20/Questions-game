@@ -56,12 +56,25 @@ def view_question_random(router, base_de_datos, schema, Clase: Type[BaseModel]):
 def play_question_general_random(router, base_de_datos):
     @router.get("/Jugar/Pregunta/Random/General")
     async def play_question_random():
-        dict_question = {}
         question = funciones_randoms.jugar_preguntas_generales(base_de_datos)
-        dict_question = {
-            "pregunta": question["pregunta"],
-            "opciones":question["opciones"],
-            "respuesta_correcta":question["respuesta_correcta"],
-            "nivel":question["nivel"]
-        }
+        dict_question = conformar_dict_question(question)
         return dict_question
+    
+    
+def play_question_category(router, base_de_datos):
+    @router.get("/Jugar/Pregunta/Random/Categoria/{categoria}")
+    async def play_question_random(categoria:str):
+        question = funciones_randoms.jugar_preguntas_de_una_categoria(base_de_datos, categoria)
+        dict_question = conformar_dict_question(question)
+        return dict_question
+    
+    
+def conformar_dict_question(question):
+    dict_question = {}
+    dict_question = {
+        "pregunta": question["pregunta"],
+        "opciones":question["opciones"],
+        "respuesta_correcta":question["respuesta_correcta"],
+        "nivel":question["nivel"]
+    }
+    return dict_question
