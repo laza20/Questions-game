@@ -50,11 +50,16 @@ peticiones_http_put.modificar_puntos_by_id(
     question_schema
 )
 
-peticiones_http_get.jugar_categorias_generales(
+peticiones_http_get.view_question_random(
     router, 
     base_de_datos, 
     question_schema, 
     Question)
+
+peticiones_http_get.play_question_general_random(
+    router, 
+    base_de_datos, 
+)
 
 peticiones_http_delete.delete_old_by_type(
     router, 
