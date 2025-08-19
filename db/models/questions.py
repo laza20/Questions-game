@@ -17,10 +17,10 @@ class Question(BaseModel):
     puntos_pregunta : Optional[int] = None
     nivel  : Optional[str] = None
     consecutiva : Optional[int] = None
-    usuario_carga: str
+    usuario_carga:  Optional[str] = None
     fecha_carga: Optional[datetime] = None
     tipo: Optional[str] = None
-    estado: bool
+    estado: Optional[bool] = None
 
 class QuestionRequest(BaseModel):
     pregunta          : str
