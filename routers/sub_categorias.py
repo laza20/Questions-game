@@ -45,3 +45,9 @@ peticiones_http_get.view_one_document_for_data_str(
     sub_categoria_schema, 
     lista_de_propiedades
     )
+
+peticiones_http_get.view_names_sub_categories(
+    router, 
+    base_de_datos, 
+    sub_categorias_schema
+)
