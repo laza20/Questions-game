@@ -4,7 +4,8 @@ from db.schemas.questions import question_schema, many_question_schema, many_req
 from peticiones_http import (
     peticiones_http_post,
     peticiones_http_get, 
-    peticiones_http_put
+    peticiones_http_put,
+    peticiones_http_delete
 )
 from validaciones import validar_questions
 
@@ -54,3 +55,8 @@ peticiones_http_get.jugar_categorias_generales(
     base_de_datos, 
     question_schema, 
     Question)
+
+peticiones_http_delete.delete_old_by_type(
+    router, 
+    base_de_datos
+)
