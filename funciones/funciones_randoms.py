@@ -14,6 +14,17 @@ def jugar_preguntas_generales(base_de_datos):
     pregunta_elegida = random.choice(documentos)
     return pregunta_elegida
 
+def jugar_preguntas_de_una_categoria(base_de_datos, categoria):
+    documentos = []
+    while not documentos:
+        nivel_elegido = aleatorizar_preguntas_de_una_categoria()
+        coleccion = getattr(db_client, base_de_datos)
+        documentos = list(coleccion.find({"nivel":{"$regex": f"^{nivel_elegido}$", "$options": "i"}, 
+                        "categoria.categoria": {"$regex": f"^{categoria}$", "$options": "i"}}))
+            
+    pregunta_elegida = random.choice(documentos)
+    return pregunta_elegida
+
 #Sirve para cuando se quiere jugar a una categoria sola.
 def aleatorizar_preguntas_de_una_categoria():
     nivel_elegido = aleatorizar_niveles()
