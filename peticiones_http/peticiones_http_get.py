@@ -29,9 +29,25 @@ def view_one_document_for_data_str(router, base_de_datos, schema, lista_de_propi
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
             detail="No se encontro ningun documento con ese dato")  
         
+def view_names_sub_categories(router, base_de_datos, schema):
+    @router.get("/Categoria/{categoria_principal}")
+    async def show_type_categori(categoria_principal:str):
+        coleccion = getattr(db_client, base_de_datos)
+        documentos = schema(coleccion.find({"tipo":base_de_datos, "categoria_principal":categoria_principal}))
+        if not documentos:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=f"No se encontraron documentos para la base de datos {base_de_datos}")
+        lista_nombres = []
+        campo = "nombre"
+        for documento in documentos:
+            nombre_doct = documento[campo]
+            lista_nombres.append(nombre_doct)
+        
+        return lista_nombres
+    
+        
         
 def jugar_categorias_generales(router, base_de_datos, schema, Clase: Type[BaseModel]):
     @router.get("/Jugar/Categoria/General", response_model=Clase)
     async def plays_game():
-        question = funciones_randoms.jugar_preguntas_generales(base_de_datos, schema)
+        question = funciones_randoms.jugar_preguntas_generales(base_de_datos)
         return question
