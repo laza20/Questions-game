@@ -1,11 +1,7 @@
 from fastapi import APIRouter
 from db.models.categorias import Categoria
-from db.schemas.categorias import categoria_schema,categorias_schema
-from peticiones_http import (
-    peticiones_http_post,
-    peticiones_http_get
-)
-from validaciones import validar_categorias
+from service import service_categorias
+from db.models.categorias import Categoria
 
 
 
@@ -15,32 +11,23 @@ router = APIRouter(prefix="/Categoria",
 )
 base_de_datos = "Categoria"
 
-peticiones_http_post.cargar_uno(
-    Categoria,
-    router,
-    base_de_datos,
-    categoria_schema,
-    validar_categorias.validacion_carga_categoria
-)
 
-peticiones_http_post.cargar_muchos(
-    Categoria,
-    router,
-    base_de_datos,
-    categorias_schema,
-    validar_categorias.validacion_carga_categoria
-)
+
+
+
+
+
+
 
 peticiones_http_get.view_old_data(
     router, 
     base_de_datos, 
-    Categoria, 
-    categorias_schema)
+    Categoria
+    )
 
-lista_de_propiedades = ["nombre_categoria", "descripcion"] 
+lista_de_propiedades = ["nombre", "descripcion"] 
 peticiones_http_get.view_one_document_for_data_str(
     router, 
     base_de_datos, 
-    categoria_schema, 
     lista_de_propiedades
     )

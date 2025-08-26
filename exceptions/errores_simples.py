@@ -26,6 +26,12 @@ def error_sin_oid(dato, base_de_datos):
         detail=f"El dato {dato} no fue encontrado en la base de datos {base_de_datos} con ningun documentos, por ende no podemos retornar un ID del mismo.")
     
     
+def limite_de_documentos_cumplido(dato, base_de_datos):
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT, 
+        detail=f"El dato {dato} no puede ser ingresado en la coleccion:'{base_de_datos}', ya que esta cumplio su limite.")
+    
+    
 def error_sin_documentos_en_la_base_de_datos(dato, base_de_datos):
     raise HTTPException(
         status_code=status.HTTP_409_CONFLICT, 

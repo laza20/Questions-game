@@ -7,20 +7,11 @@ class Stats(BaseModel):
     nivel                : int = 1
     puntos_xp            : int = 0
 
-    
 class PreguntasCreadas(BaseModel):
     id_pregunta    : Optional[str] = None
-    cat_preg       : Optional[str] = None
-    sub_cat_preg   : Optional[str] = None
-    micro_cat_preg : Optional[str] = None
-    nano_cat_preg  : Optional[str] = None
     
-
 class Favorito(BaseModel):
-    categoria_fav       : Optional[str] = None
-    sub_categoria_fav   : Optional[str] = None
-    micro_categoria_fav : Optional[str] = None
-    nano_categoria_fav  : Optional[str] = None
+    id_categoria : Optional[str] = None
 
 
 
@@ -43,10 +34,10 @@ class Usuario(BaseModel):
     avatar_url       : Optional[str] = None
     descripcion      : Optional[str] = None
     stats            : Stats = Field(default_factory=Stats)
-    logros           : List[str] = Field(default_factory=list)
-    retos            : List[str] = Field(default_factory=list)
-    favoritos        : List[Favorito] = Field(default_factory=list)
-    preguntas        : List[PreguntasCreadas] = Field(default_factory=list)
-
+    logros           : Optional[List[str]] = Field(default_factory=list)
+    retos            : Optional[List[str]] = Field(default_factory=list)
+    favoritos        : Optional[List[Favorito]] = Field(default_factory=list)
+    preguntas        : Optional[List[PreguntasCreadas]] = Field(default_factory=list)
+    control          : Control = Field(default_factory=Control)
 
 

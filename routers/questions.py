@@ -34,31 +34,29 @@ peticiones_http_post.realizar_carga_masiva(
 peticiones_http_get.view_old_data(
     router, 
     base_de_datos, 
-    Question, 
-    many_question_schema
+    Question
 )
 
 peticiones_http_put.agregar_puntos(
     router, 
-    base_de_datos, 
-    many_question_schema)
+    base_de_datos
+    )
 
 
 peticiones_http_put.modificar_puntos_by_id(
     router, 
-    base_de_datos, 
-    question_schema
+    base_de_datos
 )
 
 peticiones_http_get.view_question_random(
     router, 
-    base_de_datos, 
-    question_schema, 
-    Question)
+    base_de_datos,  
+    Question
+    )
 
 peticiones_http_get.play_question_general_random(
     router, 
-    base_de_datos, 
+    base_de_datos
 )
 
 peticiones_http_get.play_question_category(

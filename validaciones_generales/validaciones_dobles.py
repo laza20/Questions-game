@@ -1,6 +1,6 @@
 from db.client import db_client
 from validaciones_generales.lista_campos import listas_de_campos
-from errores_generales import errores_dobles, errores_simples
+from exceptions import errores_dobles, errores_simples
 from itertools import permutations
 
 def validacion_doble_general(base_de_datos, dato_uno, dato_dos):
