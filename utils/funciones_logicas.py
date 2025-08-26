@@ -25,3 +25,8 @@ def buscar_data(id, base_de_datos_2):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Dato incorrecta")
     
     return data
+
+
+def usar_coleccion(base_de_datos):
+    coleccion = getattr(db_client, base_de_datos)
+    return coleccion
