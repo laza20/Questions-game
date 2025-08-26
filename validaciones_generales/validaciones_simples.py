@@ -1,6 +1,6 @@
 from db.client import db_client
 from validaciones_generales.lista_campos import listas_de_campos
-from errores_generales import errores_simples
+from exceptions import errores_simples
 
 def validacion_simple_general(base_de_datos, dato):
     coleccion = getattr(db_client, base_de_datos)
