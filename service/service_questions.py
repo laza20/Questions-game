@@ -1,8 +1,8 @@
 from fastapi import HTTPException, status
 from db.client import db_client
 from validaciones_generales import validaciones_simples, validaciones_dobles
-from errores_generales import errores_simples
-from funciones import funcion_carga_questions
+from exceptions import errores_simples
+from utils import funcion_carga_questions
 import re
 
 
