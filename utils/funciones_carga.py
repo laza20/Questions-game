@@ -2,7 +2,7 @@ from db.client import db_client
 from typing import List, Dict
 from pymongo.results import InsertOneResult, InsertManyResult
 
-def insertar_uno(documento: Dict, coleccion_nombre: str, base_de_datos: str) -> Dict:
+def insertar_uno(documento: Dict, coleccion_nombre: str) -> Dict:
     """Inserta un único documento y retorna el documento insertado."""
     coleccion = getattr(db_client, coleccion_nombre)
     resultado: InsertOneResult = coleccion.insert_one(documento)
