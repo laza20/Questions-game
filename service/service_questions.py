@@ -4,8 +4,7 @@ from typing import Dict, List
 from fastapi import HTTPException, status
 from db.models.questions import Question
 from db.client import db_client
-from bson.objectid import ObjectId
-from validaciones_generales import validaciones_simples
+from utils import db_helpers
 from exceptions import errores_simples
 
 def insertar_question(preguntas: List[Question]) -> List[Dict]:
@@ -35,7 +34,7 @@ def insertar_question(preguntas: List[Question]) -> List[Dict]:
         # 3. Preparación del documento
         documento = pregunta.model_dump(by_alias=True, exclude_none=True)
         
-        documento["categoria_id"] = _get_categoria_id(pregunta.categoria_id)
+        documento["categoria_id"] = db_helpers._get_categoria_id(pregunta.categoria_id)
         documento.pop("id", None)
         documentos_a_insertar.append(documento)
         
@@ -65,37 +64,6 @@ def _validate_question(dato: Question):
     
     return dato.nivel
 
-def _get_categoria_id(referencia_categoria: str):
-    """
-    Función unificada para encontrar un ID de categoría.
-    Acepta tanto un ObjectId válido como un nombre de categoría.
-    """
-    try:
-        # Intenta convertir la referencia en un ObjectId.
-        oid = ObjectId(referencia_categoria)
-        # Si tiene éxito, busca por ID.
-        documento = db_client.Categorias.find_one({"_id": oid})
-        if not documento:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"No se encontró la categoría con el ID: {referencia_categoria}"
-            )
-        return oid
-    except Exception:
-        documentos = list(db_client.Categorias.find({"nombre": referencia_categoria}))
-        if not documentos:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"No se encontró la categoría con el nombre: {referencia_categoria}"
-            )
-        if len(documentos) > 1:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=f"El nombre '{referencia_categoria}' corresponde a varias categorías. Por favor, use el ID en su lugar."
-            )
-        
-        # Si se encuentra un solo documento por nombre, retorna su ID.
-        return documentos[0]['_id']
         
 def _verificar_respuesta_correcta(dato: Question):
     """Funcion que verifica que la respuesta correcta esta entre las opciones proporcionadas."""
