@@ -4,6 +4,7 @@ from fastapi import HTTPException, status
 from db.models.categorias import Categoria
 from db.client import db_client
 from bson.objectid import ObjectId
+from utils import db_helpers
 from typing import Optional
 from validaciones_generales import validaciones_simples
 from exceptions import errores_simples
@@ -36,6 +37,7 @@ def insertar_categorias(categorias: List[Categoria]) -> List[Dict]:
         documento = categoria.model_dump(by_alias=True, exclude_none=True)
         del documento["id"]
         documento["tipo"] = "Categoria"
+        documento["padre_id"] = db_helpers._get_categoria_id(categoria.padre_id)
         documentos_a_insertar.append(documento)
         
     # Inserción en la base de datos
@@ -47,34 +49,15 @@ def insertar_categorias(categorias: List[Categoria]) -> List[Dict]:
         resultado = coleccion.insert_many(documentos_a_insertar)
         nuevos_documentos = list(coleccion.find({"_id": {"$in": resultado.inserted_ids}}))
         
-    documentos = [serializar_doc(doc) for doc in nuevos_documentos]
+    documentos = [_format_document(doc) for doc in nuevos_documentos]
             
     return documentos
-
-
-def serializar_doc(doc):
-    doc["id"] = str(doc["_id"])
-    del doc["_id"]
-    return doc
 
 # --- Funciones de validación privadas, ahora unificadas aquí ---
 
 def _verificar_grado_categoria(categoria: Categoria):
     if categoria.grado == "Primer":
         _verificar_limite_categoria_principal()
-    else:
-        try:
-            oid_padre = ObjectId(categoria.padre_id)
-        except Exception:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"El ID de la categoría padre no es válido: {categoria.padre_id}"
-            )
-        if not db_client.Categorias.find_one({"_id": oid_padre}):
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"No se encontró la categoría padre con el ID: {categoria.padre_id}"
-            )
 
 def _verificar_limite_categoria_principal():
     cantidad = db_client.Categorias.count_documents({"grado": "Primer"})
@@ -95,3 +78,10 @@ def _create_key(dato: Categoria, oid_padre: Optional[ObjectId] = None):
         return dato.nombre.lower()
     else:
         return (dato.nombre.lower(), oid_padre)
+    
+def _format_document(doc: Dict) -> Dict:
+    """Funcion que formatea el id para entregar un str en lugar de un object id."""
+    if doc:
+        doc["id"] = str(doc.pop("_id"))
+        doc["padre_id"] = str(doc["padre_id"])
+    return doc
