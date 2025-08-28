@@ -21,4 +21,17 @@ async def crear_questions_endpoint(question: list[Question] = Body(...)):
     nuevas_preguntas = service_questions.insertar_question(question)
     return nuevas_preguntas 
 
+@router.get("/Ver/Todo", response_model=list[QuestionRequest], status_code=status.HTTP_202_ACCEPTED)
+async def view_old_categories():
+    """
+    End point encargado de mostrar todos los documentos de preguntas
+    """
+    preguntas = service_questions.visionar_todas_las_preguntas()
+    return preguntas
 
+@router.put("/Actaulizar/Id", response_model=list[Question], status_code=status.HTTP_202_ACCEPTED)
+async def actualizar_id():
+    """
+    End point que permite actualizar el id de str a Object id
+    """
+    service_questions.modificar_id()
