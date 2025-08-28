@@ -1,8 +1,10 @@
 from bson.objectid import ObjectId
 from fastapi import HTTPException, status
 from db.client import db_client
+from typing import Dict, List
 
-def _get_categoria_id(referencia_categoria: str):
+
+def get_categoria_id(referencia_categoria: str):
     """
     Función unificada para encontrar un ID de categoría.
     Acepta tanto un ObjectId válido como un nombre de categoría.
@@ -36,3 +38,8 @@ def _get_categoria_id(referencia_categoria: str):
     
     
     
+def transformar_id(doc: Dict) -> Dict:
+    """Funcion encargada de formatear el id para entregar un str en lugar de un object id."""
+    if doc:
+        doc["id"] = str(doc.pop("_id"))
+    return doc
