@@ -72,6 +72,18 @@ def visionar_todas_las_categorias()-> List[Dict]:
     return documentos_formateados
 
 
+def visionar_categorias_por_nivel(grado:str)-> List[Dict]:
+    documentos = list(db_client.Categorias.find({"grado":{"$regex": f"^{grado}$", "$options": "i"}}))
+    if not documentos:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, 
+            detail=f"No se encontraron las categorias necesarias"
+            )
+    
+    documentos_formatedos = [_format_document(doc) for doc in documentos]
+    return documentos_formatedos
+
+
 """ Fin de llamadas al usuario """
 
 
