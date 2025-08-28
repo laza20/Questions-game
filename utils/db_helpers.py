@@ -2,6 +2,7 @@ from bson.objectid import ObjectId
 from fastapi import HTTPException, status
 from db.client import db_client
 from typing import Dict, List
+from utils import funciones_logicas
 
 
 def get_categoria_id(referencia_categoria: str):
@@ -21,7 +22,7 @@ def get_categoria_id(referencia_categoria: str):
             )
         return oid
     except Exception:
-        documentos = list(db_client.Categorias.find({"nombre": referencia_categoria}))
+        documentos = list(db_client.Categorias.find({"nombre":{"$regex": f"^{referencia_categoria}$", "$options": "i"}}))
         if not documentos:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -34,7 +35,8 @@ def get_categoria_id(referencia_categoria: str):
             )
         
         # Si se encuentra un solo documento por nombre, retorna su ID.
-        return documentos[0]['_id']
+        padre_oid = funciones_logicas.validate_object_id(documentos[0]['_id'])
+        return padre_oid
     
     
     
