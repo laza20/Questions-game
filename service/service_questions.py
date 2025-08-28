@@ -4,7 +4,7 @@ from typing import Dict, List
 from fastapi import HTTPException, status
 from db.models.questions import Question
 from db.client import db_client
-from utils import db_helpers
+from utils import db_helpers, funciones_logicas
 from exceptions import errores_simples
 
 def insertar_question(preguntas: List[Question]) -> List[Dict]:
@@ -34,7 +34,7 @@ def insertar_question(preguntas: List[Question]) -> List[Dict]:
         # 3. Preparación del documento
         documento = pregunta.model_dump(by_alias=True, exclude_none=True)
         
-        documento["categoria_id"] = db_helpers._get_categoria_id(pregunta.categoria_id)
+        documento["categoria_id"] = db_helpers.get_categoria_id(pregunta.categoria_id)
         documento.pop("id", None)
         documentos_a_insertar.append(documento)
         
@@ -50,7 +50,36 @@ def insertar_question(preguntas: List[Question]) -> List[Dict]:
             
     return documentos
 
+def visionar_todas_las_preguntas()-> List[Dict]:
+    documentos = list(db_client.Preguntas.find({"tipo":"Preguntas"}))
+    if not documentos:
+        _sin_preguntas()
+    
+    documentos_formateados = [_format_document(doc) for doc in documentos]
+    return documentos_formateados
 
+
+def modificar_id():
+    documentos = list(db_client.Preguntas.find({"tipo":"Preguntas"}))
+    if not documentos:
+        _sin_preguntas()
+    
+    lista_documentos = []
+    
+    for documento in documentos:
+        categoria_id = documento.get("categoria_id")
+        id = documento.get("_id")
+        if not categoria_id:
+            continue
+        
+        documento["categoria_id"] = funciones_logicas.validate_object_id(documento["categoria_id"])
+        db_client.Preguntas.replace_one({"_id":id}, documento)
+        lista_documentos.append(documento)
+        
+    if lista_documentos:
+        raise HTTPException(status_code=status.HTTP_200_OK, detail="Lista actualizada correctamente")
+    else:
+        HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Error al modificar los oid")
 
 def _validate_question(dato: Question):
     """Funcion orquestadora de validaciones"""
@@ -94,6 +123,12 @@ def _format_document(doc: Dict) -> Dict:
         doc["id"] = str(doc.pop("_id"))
         doc["categoria_id"] = str(doc["categoria_id"])
     return doc
+
+def _sin_preguntas():
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT, 
+        detail=f"No se encontraron las preguntas necesarias"
+        )
 
 
 
