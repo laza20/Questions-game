@@ -17,3 +17,13 @@ async def crear_categorias_endpoint(categorias: list[Categoria] = Body(...)):
     """
     nuevas_categorias = service_categorias.insertar_categorias(categorias)
     return nuevas_categorias
+
+
+@router.get("/Ver/Todo", response_model=list[Categoria], status_code=status.HTTP_202_ACCEPTED)
+async def view_old_categories():
+    """
+    End point encargado de mostrar todos los documentos de categorias
+    """
+    categorias = service_categorias.visionar_todas_las_categorias()
+    return categorias
+    
