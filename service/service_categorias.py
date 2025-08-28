@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 from db.models.categorias import Categoria
 from db.client import db_client
 from bson.objectid import ObjectId
-from utils import db_helpers
+from utils import db_helpers, funciones_logicas
 from typing import Optional
 from validaciones_generales import validaciones_simples
 from exceptions import errores_simples
@@ -43,7 +43,7 @@ def insertar_categorias(categorias: List[Categoria]) -> List[Dict]:
         documento = categoria.model_dump(by_alias=True, exclude_none=True)
         del documento["id"]
         documento["tipo"] = "Categoria"
-        documento["padre_id"] = db_helpers._get_categoria_id(categoria.padre_id)
+        documento["padre_id"] = db_helpers.get_categoria_id(categoria.padre_id)
         documentos_a_insertar.append(documento)
         
     # Inserción en la base de datos
@@ -73,6 +73,8 @@ def visionar_todas_las_categorias()-> List[Dict]:
 
 
 def visionar_categorias_por_nivel(grado:str)-> List[Dict]:
+    """Funcion que permite retornar una o varias categorias por medio de su grado,
+    sin importar el tipo de letra."""
     documentos = list(db_client.Categorias.find({"grado":{"$regex": f"^{grado}$", "$options": "i"}}))
     if not documentos:
         raise HTTPException(
@@ -83,6 +85,41 @@ def visionar_categorias_por_nivel(grado:str)-> List[Dict]:
     documentos_formatedos = [_format_document(doc) for doc in documentos]
     return documentos_formatedos
 
+def visionar_categorias_por_padre(padre_id:str) -> List[Dict]:
+    oid_padre = db_helpers.get_categoria_id(padre_id)
+    documentos = list(db_client.Categorias.find({"padre_id":oid_padre}))
+    if not documentos:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, 
+            detail=f"No se encontraron las categorias necesarias"
+            )
+        
+        
+    documentos_formateados = [_format_document (doc) for doc in documentos]
+    return documentos_formateados
+
+
+def modificar_id():
+    documentos = list(db_client.Categorias.find({"tipo":"Categoria"}))
+    if not documentos:
+        _sin_categorias()
+    
+    lista_documentos = []
+    
+    for documento in documentos:
+        padre_id = documento.get("padre_id")
+        id = documento.get("_id")
+        if not padre_id:
+            continue
+        
+        documento["padre_id"] = funciones_logicas.validate_object_id(documento["padre_id"])
+        db_client.Categorias.replace_one({"_id":id}, documento)
+        lista_documentos.append(documento)
+        
+    if lista_documentos:
+        raise HTTPException(status_code=status.HTTP_200_OK, detail="Lista actualizada correctamente")
+    else:
+        HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Error al modificar los oid")
 
 """ Fin de llamadas al usuario """
 
@@ -120,3 +157,9 @@ def _format_document(doc: Dict) -> Dict:
         if "padre_id" in doc and doc["padre_id"] is not None:
             doc["padre_id"] = str(doc["padre_id"])
     return doc
+
+def _sin_categorias():
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT, 
+        detail=f"No se encontraron las categorias necesarias"
+        )
