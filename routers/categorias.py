@@ -35,3 +35,17 @@ async def view_data_by_grade(grado: str):
     categorias = service_categorias.visionar_categorias_por_nivel(grado)
     return categorias
     
+@router.get("/Ver/Por/Categoria/{padre_id}", response_model=list[Categoria], status_code=status.HTTP_202_ACCEPTED)
+async def view_data_by_padre_id(padre_id: str):
+    """
+    End point que permite visionar una categoria por su grado.
+    """
+    categorias = service_categorias.visionar_categorias_por_padre(padre_id)
+    return categorias
+
+@router.put("/Actaulizar/Id", response_model=list[Categoria], status_code=status.HTTP_202_ACCEPTED)
+async def actualizar_id():
+    """
+    End point que permite actualizar el id de str a Object id
+    """
+    service_categorias.modificar_id()
