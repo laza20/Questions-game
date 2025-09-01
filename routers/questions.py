@@ -35,3 +35,11 @@ async def actualizar_id():
     End point que permite actualizar el id de str a Object id
     """
     service_questions.modificar_id()
+
+@router.get("/Random/General", response_model=QuestionRequest, status_code=status.HTTP_202_ACCEPTED)
+async def view_question_random():
+    """
+    End point que llama a una pregunta aleatoria en general.
+    """
+    question = service_questions.play_question_random()
+    return question
