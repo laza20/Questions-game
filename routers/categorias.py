@@ -43,7 +43,7 @@ async def view_data_by_padre_id(padre_id: str):
     categorias = service_categorias.visionar_categorias_por_padre(padre_id)
     return categorias
 
-@router.put("/Actaulizar/Id", response_model=list[Categoria], status_code=status.HTTP_202_ACCEPTED)
+@router.put("/Actualizar/Id", response_model=list[Categoria], status_code=status.HTTP_202_ACCEPTED)
 async def actualizar_id():
     """
     End point que permite actualizar el id de str a Object id

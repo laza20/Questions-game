@@ -29,7 +29,7 @@ async def view_old_categories():
     preguntas = service_questions.visionar_todas_las_preguntas()
     return preguntas
 
-@router.put("/Actaulizar/Id", response_model=list[Question], status_code=status.HTTP_202_ACCEPTED)
+@router.put("/Actualizar/Id", response_model=list[Question], status_code=status.HTTP_202_ACCEPTED)
 async def actualizar_id():
     """
     End point que permite actualizar el id de str a Object id
