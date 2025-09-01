@@ -4,8 +4,10 @@ from typing import Dict, List
 from fastapi import HTTPException, status
 from db.models.questions import Question
 from db.client import db_client
-from utils import db_helpers, funciones_logicas
+from utils import db_helpers, funciones_logicas, funciones_randoms
 from exceptions import errores_simples
+import random
+
 
 def insertar_question(preguntas: List[Question]) -> List[Dict]:
     """
@@ -80,6 +82,37 @@ def modificar_id():
         raise HTTPException(status_code=status.HTTP_200_OK, detail="Lista actualizada correctamente")
     else:
         HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Error al modificar los oid")
+        
+        
+def play_question_random() -> Dict:
+    """
+    Función que selecciona una pregunta aleatoria de forma eficiente,
+    con un número limitado de intentos.
+    """
+    intentos_maximos = 10
+    intentos = 0
+
+    while intentos < intentos_maximos:
+        # 1. Elegir un nivel y categoría de forma aleatoria.
+        nivel_elegido = funciones_randoms.aleatorizar_niveles()
+        categoria_elegida = funciones_randoms.aleatorizar_categorias_generales()
+
+        documentos = db_helpers.seleccionar_pregunta(categoria_elegida, nivel_elegido) 
+        
+        # Si se encuentra un documento, se sale del bucle y se retorna.
+        if documentos:
+            pregunta_elegida = documentos[0]
+            pregunta_elegida["categoria_id"] = categoria_elegida
+            return _format_document(pregunta_elegida)
+        
+        intentos += 1
+
+    # Si se superan los intentos sin encontrar un documento, se lanza una excepción.
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="No se pudo encontrar una pregunta aleatoria después de varios intentos. Inténtelo de nuevo más tarde."
+    )
+
 
 def _validate_question(dato: Question):
     """Funcion orquestadora de validaciones"""
