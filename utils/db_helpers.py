@@ -45,3 +45,22 @@ def transformar_id(doc: Dict) -> Dict:
     if doc:
         doc["id"] = str(doc.pop("_id"))
     return doc
+
+def seleccionar_pregunta(categoria_elegida, nivel_elegido):
+    """Funcion encargada de buscar una pregunta de un nivel y categoria determinada."""
+    categoria_id = get_categoria_id(categoria_elegida)
+
+    # 3. Realizar la consulta a la base de datos.
+    coleccion = db_client.Preguntas
+    pipeline = [
+        {
+            "$match": {
+                "categoria_id": categoria_id,
+                "nivel": {"$regex": f"^{nivel_elegido}$", "$options": "i"}
+            }
+        },
+        {"$sample": {"size": 1}}
+    ]
+    documentos = list(coleccion.aggregate(pipeline))
+    return documentos
+        
