@@ -21,7 +21,7 @@ async def crear_questions_endpoint(question: list[Question] = Body(...)):
     nuevas_preguntas = service_questions.insertar_question(question)
     return nuevas_preguntas 
 
-@router.get("/Ver/Todo", response_model=list[QuestionRequest], status_code=status.HTTP_202_ACCEPTED)
+@router.get("/Ver/Todo", response_model=list[Question], status_code=status.HTTP_202_ACCEPTED)
 async def view_old_categories():
     """
     End point encargado de mostrar todos los documentos de preguntas
