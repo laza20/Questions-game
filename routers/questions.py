@@ -43,3 +43,9 @@ async def view_question_random():
     """
     question = service_questions.play_question_random()
     return question
+
+@router.get("/Categoria/Principal/{categoria}", response_model=QuestionRequest, status_code=status.HTTP_202_ACCEPTED)
+async def view_question_by_category(categoria:str):
+    """End point el cual retorna una pregunta de una categoria determinada."""
+    question = service_questions.play_question_by_category(categoria)
+    return question
