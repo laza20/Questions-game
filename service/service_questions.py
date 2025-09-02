@@ -4,7 +4,7 @@ from typing import Dict, List
 from fastapi import HTTPException, status
 from db.models.questions import Question
 from db.client import db_client
-from utils import db_helpers, funciones_logicas, funciones_randoms
+from utils import db_helpers, funciones_logicas, funciones_randoms, graphlookups
 from exceptions import errores_simples
 import random
 
@@ -97,22 +97,28 @@ def play_question_random() -> Dict:
         nivel_elegido = funciones_randoms.aleatorizar_niveles()
         categoria_elegida = funciones_randoms.aleatorizar_categorias_generales()
 
-        documentos = db_helpers.seleccionar_pregunta(categoria_elegida, nivel_elegido) 
-        
-        # Si se encuentra un documento, se sale del bucle y se retorna.
+        try:
+            # 2. Llamar a la nueva función para obtener documentos
+            documentos = graphlookups.seleccionar_pregunta_con_graphlookup(categoria_elegida, nivel_elegido)
+        except HTTPException:
+            # Si la categoría no existe, se incrementa el contador y se intenta de nuevo
+            intentos += 1
+            continue
+
+        # Si se encuentra un documento, se sale del bucle y se retorna
         if documentos:
             pregunta_elegida = documentos[0]
-            pregunta_elegida["categoria_id"] = categoria_elegida
+            # No se necesita modificar categoria_id aquí, ya que el documento devuelto
+            # por la pipeline ya es correcto.
             return _format_document(pregunta_elegida)
         
         intentos += 1
 
-    # Si se superan los intentos sin encontrar un documento, se lanza una excepción.
+    # Si se superan los intentos sin encontrar un documento, se lanza una excepción
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail="No se pudo encontrar una pregunta aleatoria después de varios intentos. Inténtelo de nuevo más tarde."
     )
-
 
 def _validate_question(dato: Question):
     """Funcion orquestadora de validaciones"""
