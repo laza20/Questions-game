@@ -99,7 +99,7 @@ def play_question_random() -> Dict:
 
         try:
             # 2. Llamar a la nueva función para obtener documentos
-            documentos = graphlookups.seleccionar_pregunta_con_graphlookup(categoria_elegida, nivel_elegido)
+            documentos = db_helpers.seleccionar_pregunta_con_graphlookup(categoria_elegida, nivel_elegido)
         except HTTPException:
             # Si la categoría no existe, se incrementa el contador y se intenta de nuevo
             intentos += 1
