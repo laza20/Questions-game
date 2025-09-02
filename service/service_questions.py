@@ -108,6 +108,8 @@ def play_question_random() -> Dict:
         # Si se encuentra un documento, se sale del bucle y se retorna
         if documentos:
             pregunta_elegida = documentos[0]
+            pregunta_elegida["categoria_id"] = db_helpers.get_categoria_id(pregunta_elegida["categoria_id"])
+            pregunta_elegida["categoria_id"] = db_helpers.get_name_category(pregunta_elegida["categoria_id"])
             # No se necesita modificar categoria_id aquí, ya que el documento devuelto
             # por la pipeline ya es correcto.
             return _format_document(pregunta_elegida)
@@ -141,6 +143,8 @@ def play_question_by_category(categoria:str) -> Dict:
         # Si se encuentra un documento, se sale del bucle y se retorna
         if documentos:
             pregunta_elegida = documentos[0]
+            pregunta_elegida["categoria_id"] = db_helpers.get_categoria_id(pregunta_elegida["categoria_id"])
+            pregunta_elegida["categoria_id"] = db_helpers.get_name_category(pregunta_elegida["categoria_id"])
             # No se necesita modificar categoria_id aquí, ya que el documento devuelto
             # por la pipeline ya es correcto.
             return _format_document(pregunta_elegida)
@@ -152,6 +156,46 @@ def play_question_by_category(categoria:str) -> Dict:
         status_code=status.HTTP_404_NOT_FOUND,
         detail="No se pudo encontrar una pregunta aleatoria después de varios intentos. Inténtelo de nuevo más tarde."
     )
+    
+def play_duel() -> Dict:
+    """
+    Función que selecciona 10 preguntas aleatorias para un duelo.
+    """
+    intentos_maximos = 100
+    intentos = 0
+    preguntas = []
+    while intentos < intentos_maximos:
+        # 1. Elegir un nivel y categoría de forma aleatoria.
+        nivel_elegido = funciones_randoms.aleatorizar_niveles()
+        categoria_elegida = funciones_randoms.aleatorizar_categorias_generales()
+        try:
+            # 2. Llamar a la nueva función para obtener documentos
+            documentos = db_helpers.seleccionar_pregunta_con_graphlookup(categoria_elegida, nivel_elegido)
+        except HTTPException:
+            # Si la categoría no existe, se incrementa el contador y se intenta de nuevo
+            intentos += 1
+            continue
+
+        # Si se encuentra un documento, se sale del bucle y se retorna
+        if documentos:
+            pregunta_elegida = documentos[0]
+            pregunta_elegida["categoria_id"] = db_helpers.get_categoria_id(pregunta_elegida["categoria_id"])
+            pregunta_elegida["categoria_id"] = db_helpers.get_name_category(pregunta_elegida["categoria_id"])
+            pregunta_formateada = _format_document(documentos[0])
+            preguntas.append(pregunta_formateada)
+            # No se necesita modificar categoria_id aquí, ya que el documento devuelto
+            # por la pipeline ya es correcto.
+            if len(preguntas) == 10:
+                return preguntas
+        
+        intentos += 1
+
+    # Si se superan los intentos sin encontrar un documento, se lanza una excepción
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="No se pudo encontrar una pregunta aleatoria después de varios intentos. Inténtelo de nuevo más tarde."
+    )
+    
 
 def _validate_question(dato: Question):
     """Funcion orquestadora de validaciones"""
