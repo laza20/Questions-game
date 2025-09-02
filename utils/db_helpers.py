@@ -38,6 +38,10 @@ def get_categoria_id(referencia_categoria: str):
         padre_oid = funciones_logicas.validate_object_id(documentos[0]['_id'])
         return padre_oid
     
+def get_name_category(oid):
+    categoria = db_client.Categorias.find_one({"_id":oid})
+    nombre_categoria = categoria["nombre"]
+    return nombre_categoria
     
     
 def transformar_id(doc: Dict) -> Dict:
