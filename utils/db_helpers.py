@@ -52,23 +52,24 @@ def transformar_id(doc: Dict) -> Dict:
 
 def seleccionar_pregunta_con_graphlookup(categoria_elegida: str, nivel_elegido: str):
     """
-    Function that finds a question in a category and its subcategories.
+    Funcion encargada de buscar una pregunta de una categoria padre en sus hijos 
+    y retornar la pregunta final.
     """
     try:
-        # 1. Get the _id of the main category.
+        # Obtiene el padre id por medio del nombre
         categoria_padre_id = get_categoria_id(categoria_elegida)
         
-        # 2. Get all the IDs from the main category's tree.
+        # Obtiene todos los ids de las sub categorias de una categoria padre
         all_relevant_ids = graphlookups.get_all_descendant_ids_principal(categoria_padre_id)
         
     except HTTPException:
-        # Raises an exception if the category is not found.
+        # En caso de que la categoria ingresada no exista en la base de datos.
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"La categoría '{categoria_elegida}' no existe."
         )
 
-    # 3. Perform a simple and efficient search with the obtained IDs.
+    # Busqueda de documentos que cumplan con las condiciones planteadas.
     coleccion = db_client.Preguntas
     pipeline = [
         {
