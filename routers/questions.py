@@ -55,9 +55,17 @@ async def view_question_by_category(categoria:str):
 
 
 @router.get("/Duelo/General", response_model=list[QuestionRequest], status_code=status.HTTP_202_ACCEPTED)
-async def view_many_questions_for_duel():
+async def play_duel_general_router():
     """
     End point el cual retorna 10 preguntas para el duelo.
     """
-    question = service_questions.play_duel()
+    question = service_questions.play_duel_general()
+    return question
+
+@router.get("/Duelo/Categoria/{categoria}", response_model=list[QuestionRequest], status_code=status.HTTP_202_ACCEPTED)
+async def paly_duel_category_router(categoria:str):
+    """
+    End point encargado de devolveer 10 preguntas de una categoria.
+    """
+    question = service_questions.play_duel_category(categoria)
     return question
