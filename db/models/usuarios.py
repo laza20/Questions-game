@@ -24,7 +24,7 @@ class Control(BaseModel):
 
 # Documento principal de la colección 'usuarios'
 class Usuario(BaseModel):
-    id               : Optional[str] = Field(alias="_id", default=None)
+    id               : Optional[str] = None
     nombre_usuario   : str
     mail_usuario     : EmailStr
     password_hash    : str
@@ -38,5 +38,17 @@ class Usuario(BaseModel):
     favoritos        : Optional[List[Favorito]] = Field(default_factory=list)
     preguntas        : Optional[List[PreguntasCreadas]] = Field(default_factory=list)
     control          : Control = Field(default_factory=Control)
+    
+class UsuarioCreado(BaseModel):
+    nombre_usuario   : str
+    mail_usuario     : EmailStr
+    password_hash    : str
+    fecha_nacimiento : datetime
+    
+class UsarioLogeado(BaseModel):
+    nombre_usuario   : str
+    mail_usuario     : EmailStr
+    avatar_url       : Optional[str] = None
+    
 
 
