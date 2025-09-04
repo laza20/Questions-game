@@ -2,22 +2,27 @@ from datetime import datetime, timezone
 from typing import List, Optional
 from pydantic import BaseModel, Field
 
+class PreguntasRonda(BaseModel):
+    pregunta_id       : str
+    respuesta_correcta: bool
+    puntos_pregunta   : int
+    nivel_pregunta    : str
+
 # Representa una sola ronda dentro de un duelo
 class RondaDuelo(BaseModel):
-    pregunta_id: str
-    respuesta_correcta: bool
-    puntos_obtenidos: int
+    preguntas_ronda    : list[PreguntasRonda]
+    puntos_obtenidos   : int
     tiempo_respuesta_ms: int
 
 # El modelo de la colección 'duelos'
 class Duelo(BaseModel):
-    id: Optional[str] = Field(alias="_id", default=None)
-    usuario_uno_id: str
-    usuario_dos_id: str
-    rondas_usuario_uno: List[RondaDuelo] = Field(default_factory=list)
-    rondas_usuario_dos: List[RondaDuelo] = Field(default_factory=list)
-    puntos_finales_usuario_uno: Optional[int] = None
-    puntos_finales_usuario_dos: Optional[int] = None
-    fecha_inicio: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    fecha_fin: Optional[datetime] = None
-    ganador_id: Optional[str] = None
+    id                          : Optional[str] = None
+    usuario_uno_id              : str
+    usuario_dos_id              : str
+    rondas_usuario_uno          : List[RondaDuelo] = Field(default_factory=list)
+    rondas_usuario_dos          : List[RondaDuelo] = Field(default_factory=list)
+    puntos_finales_usuario_uno  : Optional[int] = None
+    puntos_finales_usuario_dos  : Optional[int] = None
+    fecha_inicio                : datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    fecha_fin                   : Optional[datetime] = None
+    ganador_id                  : Optional[str] = None
