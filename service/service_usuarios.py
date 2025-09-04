@@ -23,6 +23,7 @@ def insert_users(user: Usuario) -> List[Dict]:
     _validacion_usuario(user)
     documento = user.model_dump(by_alias=True, exclude_none=True)
     documento.pop("id", None)
+    documento["password_hash"] = crypt.hash(user.password_hash)
     coleccion = db_client.Usuarios
     id = coleccion.insert_one(documento).inserted_id
     nuevo_documento = [coleccion.find_one({"_id": id})]
