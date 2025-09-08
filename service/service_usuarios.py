@@ -10,9 +10,9 @@ import secrets
 from db.client import db_client
 
 ALGORITHM = "HS256"
-ACCESS_TOKEN_DURATION = 1
+ACCESS_TOKEN_DURATION = 10
 hex_token = secrets.token_hex(16) 
-oauth2 = OAuth2PasswordBearer(tokenUrl="login")
+oauth2 = OAuth2PasswordBearer(tokenUrl="token")
 crypt = CryptContext(schemes=["bcrypt"]  )
 
 def insert_users(user: Usuario) -> List[Dict]:
