@@ -31,6 +31,29 @@ def insert_users(user: Usuario) -> List[Dict]:
             
     return resultado
 
+def login_user(usuario:OAuth2PasswordRequestForm = Depends())-> str:
+    """
+    Funcion la cual sirve para logear un usuario y darle un token
+    """
+    usuario_db = db_client.Usuarios.find_one({"nombre_usuario":usuario.username})
+    if not usuario_db:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Usuario no encontrado")
+    dict_usuario = dict(usuario_db)
+    if not crypt.verify(usuario.password, dict_usuario["password_hash"]):
+        raise HTTPException(
+            status_code= 400, detail= "La contraseña es incorrecta")
+        
+    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_DURATION)
+    
+    acces_token = {"sub":dict_usuario["nombre_usuario"], "exp":expire}
+    
+    if dict_usuario.get("estado", False):
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="El usuario esta inactivo")
+    
+    return {"access_token": jwt.encode(acces_token,hex_token,algorithm=ALGORITHM), "token_type": "bearer"}
+
+
+
 def _validacion_usuario(user:Usuario):
     
     if db_client.Usuarios.find_one({"mail_usuario":user.mail_usuario}):
