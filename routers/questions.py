@@ -16,7 +16,7 @@ router = APIRouter(prefix="/Preguntas",
 base_de_datos = "Preguntas"
 
 @router.post("/Realizar/Carga", response_model=list[QuestionRequest], status_code=status.HTTP_201_CREATED)
-async def crear_questions_endpoint(question: list[Question] = Body(...)):
+async def crear_questions_endpoint(question: list[Question] = Body(...), current_user: dict = Depends(get_current_user)):
     """
     Crea una o varias categorías en la base de datos.
     """
@@ -32,14 +32,14 @@ async def view_old_categories(current_user: dict = Depends(get_current_user)):
     return preguntas
 
 @router.put("/Actualizar/Id", response_model=list[Question], status_code=status.HTTP_202_ACCEPTED)
-async def actualizar_id():
+async def actualizar_id(current_user: dict = Depends(get_current_user)):
     """
     End point que permite actualizar el id de str a Object id
     """
     service_questions.modificar_id()
 
 @router.get("/Random/General", response_model=QuestionRequest, status_code=status.HTTP_202_ACCEPTED)
-async def view_question_random():
+async def view_question_random(current_user: dict = Depends(get_current_user)):
     """
     End point que llama a una pregunta aleatoria en general.
     """
@@ -47,7 +47,7 @@ async def view_question_random():
     return question
 
 @router.get("/Categoria/Principal/{categoria}", response_model=QuestionRequest, status_code=status.HTTP_202_ACCEPTED)
-async def view_question_by_category(categoria:str):
+async def view_question_by_category(categoria:str, current_user: dict = Depends(get_current_user)):
     """
     End point el cual retorna una pregunta de una categoria determinada.
     Funciona con todas las categorias de cualquier grado.
@@ -57,7 +57,7 @@ async def view_question_by_category(categoria:str):
 
 
 @router.get("/Duelo/General", response_model=list[QuestionRequest], status_code=status.HTTP_202_ACCEPTED)
-async def play_duel_general_router():
+async def play_duel_general_router(current_user: dict = Depends(get_current_user)):
     """
     End point el cual retorna 10 preguntas para el duelo.
     """
@@ -65,7 +65,7 @@ async def play_duel_general_router():
     return question
 
 @router.get("/Duelo/Categoria/{categoria}", response_model=list[QuestionRequest], status_code=status.HTTP_202_ACCEPTED)
-async def paly_duel_category_router(categoria:str):
+async def paly_duel_category_router(categoria:str, current_user: dict = Depends(get_current_user)):
     """
     End point encargado de devolveer 10 preguntas de una categoria.
     """
