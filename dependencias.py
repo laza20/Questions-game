@@ -2,13 +2,13 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from pydantic import BaseModel
-import secrets
+import os
 from db.client import db_client
-from service.service_usuarios import oauth2, hex_token
+from service.service_usuarios import oauth2
 
 # Defines the scheme for getting the token from the header
 ALGORITHM = "HS256"
-
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 class TokenData(BaseModel):
     username: str | None = None
@@ -23,7 +23,7 @@ async def get_current_user(token: str = Depends(oauth2)):
     try:
         # payload = jwt.decode(token, hex_token, algorithms=[ALGORITHM])
         # Note: Be sure to use a persistent secret key, not one generated on each startup
-        payload = jwt.decode(token, hex_token ,algorithms=[ALGORITHM])
+        payload = jwt.decode(token, SECRET_KEY ,algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
