@@ -2,16 +2,16 @@ from fastapi import APIRouter, HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import jwt, JWTError
 from passlib.context import CryptContext
+import os
 from typing import Dict, List
 from db.models.usuarios import Usuario
 from datetime import datetime, timedelta, timezone
 from utils import db_helpers
-import secrets
 from db.client import db_client
 
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_DURATION = 10
-hex_token = secrets.token_hex(16) 
 oauth2 = OAuth2PasswordBearer(tokenUrl="token")
 crypt = CryptContext(schemes=["bcrypt"]  )
 
@@ -50,7 +50,7 @@ def login_user(usuario:OAuth2PasswordRequestForm = Depends())-> str:
     if dict_usuario.get("estado", False):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="El usuario esta inactivo")
     
-    return {"access_token": jwt.encode(acces_token,hex_token,algorithm=ALGORITHM), "token_type": "bearer"}
+    return {"access_token": jwt.encode(acces_token,SECRET_KEY,algorithm=ALGORITHM), "token_type": "bearer"}
 
 
 
