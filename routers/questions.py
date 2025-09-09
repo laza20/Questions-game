@@ -4,6 +4,8 @@ from service import service_questions
 from fastapi import status, Body
 from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
+from fastapi import APIRouter, Depends
+from dependencias import get_current_user 
 
 
 
@@ -22,7 +24,7 @@ async def crear_questions_endpoint(question: list[Question] = Body(...)):
     return nuevas_preguntas 
 
 @router.get("/Ver/Todo", response_model=list[Question], status_code=status.HTTP_202_ACCEPTED)
-async def view_old_categories():
+async def view_old_categories(current_user: dict = Depends(get_current_user)):
     """
     End point encargado de mostrar todos los documentos de preguntas
     """
