@@ -3,6 +3,8 @@ from db.models.categorias import Categoria
 from service import service_categorias
 from db.models.categorias import Categoria
 from fastapi import HTTPException, status, Body
+from fastapi import APIRouter, Depends
+from dependencias import get_current_user 
 
 router = APIRouter(prefix="/Categoria",
                    tags=["CATEGORIA"],
@@ -11,7 +13,7 @@ router = APIRouter(prefix="/Categoria",
 base_de_datos = "Categorias"
 
 @router.post("/Realizar/Carga", response_model=list[Categoria], status_code=status.HTTP_201_CREATED)
-async def crear_categorias_endpoint(categorias: list[Categoria] = Body(...)):
+async def crear_categorias_endpoint(categorias: list[Categoria] = Body(...), current_user: dict = Depends(get_current_user)):
     """
     End point encargado de crear una o varias categorías en la base de datos.
     """
@@ -20,7 +22,7 @@ async def crear_categorias_endpoint(categorias: list[Categoria] = Body(...)):
 
 
 @router.get("/Ver/Todo", response_model=list[Categoria], status_code=status.HTTP_202_ACCEPTED)
-async def view_old_categories():
+async def view_old_categories(current_user: dict = Depends(get_current_user)):
     """
     End point encargado de mostrar todos los documentos de categorias
     """
@@ -28,7 +30,7 @@ async def view_old_categories():
     return categorias
 
 @router.get("/Ver/Nivel/{grado}", response_model=list[Categoria], status_code=status.HTTP_202_ACCEPTED)
-async def view_data_by_grade(grado: str):
+async def view_data_by_grade(grado: str, current_user: dict = Depends(get_current_user)):
     """
     End point que permite visionar una categoria por su grado.
     """
@@ -36,7 +38,7 @@ async def view_data_by_grade(grado: str):
     return categorias
     
 @router.get("/Ver/Por/Categoria/{padre_id}", response_model=list[Categoria], status_code=status.HTTP_202_ACCEPTED)
-async def view_data_by_padre_id(padre_id: str):
+async def view_data_by_padre_id(padre_id: str, current_user: dict = Depends(get_current_user)):
     """
     End point que permite visionar una categoria por su grado.
     """
@@ -44,7 +46,7 @@ async def view_data_by_padre_id(padre_id: str):
     return categorias
 
 @router.put("/Actualizar/Id", response_model=list[Categoria], status_code=status.HTTP_202_ACCEPTED)
-async def actualizar_id():
+async def actualizar_id(current_user: dict = Depends(get_current_user)):
     """
     End point que permite actualizar el id de str a Object id
     """
