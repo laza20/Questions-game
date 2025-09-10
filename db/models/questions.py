@@ -17,9 +17,23 @@ class Question(BaseModel):
     estado             : Optional[bool]     = True
 
 class QuestionRequest(BaseModel):
+    id                : str
     pregunta          : str
     opciones          : List[str]
     respuesta_correcta: str
     nivel             : str
     categoria_id      : str
     usuario_carga     : str
+    
+class Respuesta(BaseModel):
+    id                 : str
+    respuesta_correcta : str  
+    respuesta_acertada : str
+    
+class QuestionAnswer(BaseModel):
+    id             : str
+    pregunta       : str
+    opciones       : str
+    nivel          : str
+    categoria_id   : str
+    usuario_carga  : str
