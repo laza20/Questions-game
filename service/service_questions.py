@@ -4,7 +4,7 @@ from typing import Dict, List
 from fastapi import HTTPException, status
 from db.models.questions import Question
 from db.client import db_client
-from utils import db_helpers, funciones_logicas, funciones_randoms, graphlookups
+from utils import db_helpers, funciones_logicas, funciones_randoms, graphlookups, funcion_nivel_pregunta
 from exceptions import errores_simples
 import random
 
@@ -241,6 +241,65 @@ def play_duel_category(categoria:str) -> Dict:
         detail="No se pudo encontrar una pregunta aleatoria después de varios intentos. Inténtelo de nuevo más tarde."
     )
     
+    
+def aswer_one_question(respuesta:str) -> Dict:
+    """
+    Funcion que sirve para responder una pregunta
+    """
+    print(respuesta)
+    id = respuesta["id"]
+    oid = funciones_logicas.validate_object_id(id)
+    pregunta_elegida = db_client.Preguntas.find_one({"_id":oid})
+    pregunta_elegida["categoria_id"] = db_helpers.get_categoria_id(pregunta_elegida["categoria_id"])
+    pregunta_elegida["categoria_id"] = db_helpers.get_name_category(pregunta_elegida["categoria_id"])
+    # No se necesita modificar categoria_id aquí, ya que el documento devuelto
+    # por la pipeline ya es correcto.
+    
+    #caso en que responda correcto    
+    puntos = pregunta_elegida["puntos_pregunta"]
+    if pregunta_elegida["respuesta_correcta"] ==   respuesta["respuesta_correcta"].capitalize():
+        
+        if pregunta_elegida["consecutiva"] <= 0:
+            pregunta_elegida["puntos_pregunta"] += 10
+            pregunta_elegida["consecutiva"] = 0
+            pregunta_elegida["consecutiva"] += 1
+            pregunta_elegida["nivel"] = funcion_nivel_pregunta.cargar_nivel_pregunta(puntos)
+        else: 
+            pregunta_elegida["puntos_pregunta"] += 20
+            pregunta_elegida["consecutiva"] += 1
+            pregunta_elegida["nivel"] = funcion_nivel_pregunta.cargar_nivel_pregunta(puntos)
+        
+        respuesta_acertada = "CORRECTA"
+        
+        
+    if pregunta_elegida["respuesta_correcta"] != respuesta["respuesta_correcta"].capitalize():
+        if pregunta_elegida["consecutiva"] >= 0:
+            pregunta_elegida["puntos_pregunta"] -= 10
+            pregunta_elegida["consecutiva"] = 0
+            pregunta_elegida["consecutiva"] -= 1
+            pregunta_elegida["nivel"] = funcion_nivel_pregunta.cargar_nivel_pregunta(puntos)
+        else:
+            pregunta_elegida["puntos_pregunta"] -= 20
+            pregunta_elegida["consecutiva"] -= 1
+            pregunta_elegida["nivel"] = funcion_nivel_pregunta.cargar_nivel_pregunta(puntos)
+        
+        respuesta_acertada = "INCORRECTA"
+        
+    db_client.Preguntas.find_one_and_replace({"_id":oid}, pregunta_elegida)
+    pregunta_formateada = _format_document(pregunta_elegida)
+    pregunta_formateada["respuesta_acertada"] = respuesta_acertada
+    return pregunta_formateada
+
+def view_question_for_id(id:str) -> Dict:
+    """
+    Funcion que sirve para visualizar una pregunta por medio del id
+    """
+    oid = funciones_logicas.validate_object_id(id)
+    pregunta = db_client.Preguntas.find_one({"_id":oid})
+    if not pregunta:
+        _sin_preguntas()
+    pregunta_formateada = _format_document(pregunta)
+    return pregunta
 
 def _validate_question(dato: Question):
     """Funcion orquestadora de validaciones"""
