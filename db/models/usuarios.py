@@ -30,6 +30,7 @@ class Usuario(BaseModel):
     password_hash    : str
     nombre           : str
     apellido         : str
+    rango            : Optional[str] = "User" #Rangos = User, Editor, Moderador, Admin
     fecha_nacimiento : datetime
     avatar_url       : Optional[str] = None
     descripcion      : Optional[str] = None
