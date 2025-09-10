@@ -4,7 +4,7 @@ from service import service_categorias
 from db.models.categorias import Categoria
 from fastapi import HTTPException, status, Body
 from fastapi import APIRouter, Depends
-from dependencias import get_current_user 
+from dependencias import get_current_user, is_primer_rango, is_segundo_rango, is_tercer_rango
 
 router = APIRouter(prefix="/Categoria",
                    tags=["CATEGORIA"],
@@ -30,7 +30,7 @@ async def view_old_categories(current_user: dict = Depends(get_current_user)):
     return categorias
 
 @router.get("/Ver/Nivel/{grado}", response_model=list[Categoria], status_code=status.HTTP_202_ACCEPTED)
-async def view_data_by_grade(grado: str, current_user: dict = Depends(get_current_user)):
+async def view_data_by_grade(grado: str, current_user: dict = Depends(is_tercer_rango)):
     """
     End point que permite visionar una categoria por su grado.
     """
@@ -46,7 +46,7 @@ async def view_data_by_padre_id(padre_id: str, current_user: dict = Depends(get_
     return categorias
 
 @router.put("/Actualizar/Id", response_model=list[Categoria], status_code=status.HTTP_202_ACCEPTED)
-async def actualizar_id(current_user: dict = Depends(get_current_user)):
+async def actualizar_id(current_user: dict = Depends(is_tercer_rango)):
     """
     End point que permite actualizar el id de str a Object id
     """
