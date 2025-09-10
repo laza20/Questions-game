@@ -155,7 +155,7 @@ def _format_document(doc: Dict) -> Dict:
     if doc:
         doc["id"] = str(doc.pop("_id"))
         if "padre_id" in doc and doc["padre_id"] is not None:
-            doc["padre_id"] = str(doc["padre_id"])
+            doc["padre_id"] = db_helpers.get_name_category(doc["padre_id"])
     return doc
 
 def _sin_categorias():
