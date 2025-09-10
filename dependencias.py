@@ -37,3 +37,31 @@ async def get_current_user(token: str = Depends(oauth2)):
         raise credentials_exception
 
     return user_in_db
+
+
+def is_primer_rango(current_user: dict = Depends(get_current_user)):
+    if current_user["rango"] != "Admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permisos para realizar esta acción."
+        )
+    
+    return current_user
+
+def is_segundo_rango(current_user: dict = Depends(get_current_user)):
+    if current_user["rango"] != "Editor" and current_user["rango"] != "Admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permisos para realizar esta acción."
+        )
+    
+    return current_user
+
+def is_tercer_rango(current_user: dict = Depends(get_current_user)):
+    if current_user["rango"] != "Moderador" and current_user["rango"] != "Editor" and current_user["rango"] != "Admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permisos para realizar esta acción."
+        )
+    
+    return current_user
