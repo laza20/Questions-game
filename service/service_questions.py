@@ -4,7 +4,15 @@ from typing import Dict, List
 from fastapi import HTTPException, status
 from db.models.questions import Question
 from db.client import db_client
-from utils import db_helpers, funciones_logicas, funciones_randoms, graphlookups, funcion_nivel_pregunta
+from utils import (
+    db_helpers, 
+    funciones_logicas, 
+    funciones_randoms, 
+    graphlookups, 
+    funcion_nivel_pregunta,
+    funcion_niveles_usuario,
+    puntos_usuario_por_pregunta
+    )
 from exceptions import errores_simples
 import random
 
@@ -242,26 +250,48 @@ def play_duel_category(categoria:str) -> Dict:
     )
     
     
-def aswer_one_question(respuesta:str) -> Dict:
+def aswer_one_question(respuesta:dict, current_user:dict) -> Dict:
     """
     Funcion que sirve para responder una pregunta
     """
-    print(respuesta)
-    id = respuesta["id"]
-    oid = funciones_logicas.validate_object_id(id)
-    pregunta_elegida = db_client.Preguntas.find_one({"_id":oid})
+    id_respuesta = respuesta["id"]
+    oid_respuesta = funciones_logicas.validate_object_id(id_respuesta)
+    pregunta_elegida = db_client.Preguntas.find_one({"_id":oid_respuesta})
     pregunta_elegida["categoria_id"] = db_helpers.get_categoria_id(pregunta_elegida["categoria_id"])
     pregunta_elegida["categoria_id"] = db_helpers.get_name_category(pregunta_elegida["categoria_id"])
-    # No se necesita modificar categoria_id aquí, ya que el documento devuelto
-    # por la pipeline ya es correcto.
     
-    #caso en que responda correcto    
+ 
     pregunta_elegida, respuesta_acertada = db_helpers.asignacion_de_puntos_a_pregunta(pregunta_elegida, respuesta)
+    
         
-    db_client.Preguntas.find_one_and_replace({"_id":oid}, pregunta_elegida)
+    db_client.Preguntas.find_one_and_replace({"_id":oid_respuesta}, pregunta_elegida)
+    nivel_pregunta = pregunta_elegida["nivel"]
+    puntos_positivos, puntos_negativos = puntos_usuario_por_pregunta.puntos_por_nivel_pregunta(nivel_pregunta)
+    if respuesta_acertada == "CORRECTA":
+        puntos_a_sumar = puntos_positivos 
+        nivel = funcion_niveles_usuario.niveles_usuario(current_user["stats"]["puntos_xp"])
+        updates = {
+            "$inc": {"stats.puntos_xp": puntos_a_sumar},
+            "$set": {"stats.nivel": nivel}
+        }
+    elif respuesta_acertada == "INCORRECTA" and current_user["stats"]["puntos_xp"] <= 1700 and current_user["stats"]["nivel"] >= 15:
+        updates = {
+            "$inc": {"stats.puntos_xp": puntos_negativos},
+        }
+    else:
+        updates = {} 
+
+    usuario_modificado = db_client.Usuarios.find_one_and_update(
+        {"_id": current_user["_id"]},
+        updates,
+        return_document=True 
+    )
+
+    usuario_formateado = db_helpers.transformar_id(usuario_modificado)
     pregunta_formateada = _format_document(pregunta_elegida)
     pregunta_formateada["respuesta_acertada"] = respuesta_acertada
-    return pregunta_formateada
+
+    return pregunta_formateada, usuario_formateado
 
 def view_question_for_id(id:str) -> Dict:
     """
