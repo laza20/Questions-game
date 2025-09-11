@@ -85,7 +85,7 @@ def seleccionar_pregunta_con_graphlookup(categoria_elegida: str, nivel_elegido: 
         
 def asignacion_de_puntos_a_pregunta(pregunta_elegida, respuesta):
     puntos = pregunta_elegida["puntos_pregunta"]
-    if pregunta_elegida["respuesta_correcta"] ==   respuesta["respuesta_correcta"].capitalize():
+    if pregunta_elegida["respuesta_correcta"] == respuesta["respuesta_correcta"]:
         
         if pregunta_elegida["consecutiva"] <= 0:
             pregunta_elegida["puntos_pregunta"] -= 10
@@ -100,7 +100,7 @@ def asignacion_de_puntos_a_pregunta(pregunta_elegida, respuesta):
         respuesta_acertada = "CORRECTA"
         
         
-    if pregunta_elegida["respuesta_correcta"] != respuesta["respuesta_correcta"].capitalize():
+    if pregunta_elegida["respuesta_correcta"] != respuesta["respuesta_correcta"]:
         if pregunta_elegida["consecutiva"] >= 0:
             pregunta_elegida["puntos_pregunta"] += 10
             pregunta_elegida["consecutiva"] = 0
