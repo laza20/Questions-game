@@ -51,5 +51,9 @@ class UsarioLogeado(BaseModel):
     mail_usuario     : EmailStr
     avatar_url       : Optional[str] = None
     
+class UsuarioPlayer(BaseModel):
+    nombre_usuario   : str
+    stats            : Stats = Field(default_factory=Stats)
+    
 
 
