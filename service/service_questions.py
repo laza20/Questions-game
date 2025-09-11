@@ -256,34 +256,7 @@ def aswer_one_question(respuesta:str) -> Dict:
     # por la pipeline ya es correcto.
     
     #caso en que responda correcto    
-    puntos = pregunta_elegida["puntos_pregunta"]
-    if pregunta_elegida["respuesta_correcta"] ==   respuesta["respuesta_correcta"].capitalize():
-        
-        if pregunta_elegida["consecutiva"] <= 0:
-            pregunta_elegida["puntos_pregunta"] += 10
-            pregunta_elegida["consecutiva"] = 0
-            pregunta_elegida["consecutiva"] += 1
-            pregunta_elegida["nivel"] = funcion_nivel_pregunta.cargar_nivel_pregunta(puntos)
-        else: 
-            pregunta_elegida["puntos_pregunta"] += 20
-            pregunta_elegida["consecutiva"] += 1
-            pregunta_elegida["nivel"] = funcion_nivel_pregunta.cargar_nivel_pregunta(puntos)
-        
-        respuesta_acertada = "CORRECTA"
-        
-        
-    if pregunta_elegida["respuesta_correcta"] != respuesta["respuesta_correcta"].capitalize():
-        if pregunta_elegida["consecutiva"] >= 0:
-            pregunta_elegida["puntos_pregunta"] -= 10
-            pregunta_elegida["consecutiva"] = 0
-            pregunta_elegida["consecutiva"] -= 1
-            pregunta_elegida["nivel"] = funcion_nivel_pregunta.cargar_nivel_pregunta(puntos)
-        else:
-            pregunta_elegida["puntos_pregunta"] -= 20
-            pregunta_elegida["consecutiva"] -= 1
-            pregunta_elegida["nivel"] = funcion_nivel_pregunta.cargar_nivel_pregunta(puntos)
-        
-        respuesta_acertada = "INCORRECTA"
+    pregunta_elegida, respuesta_acertada = db_helpers.asignacion_de_puntos_a_pregunta(pregunta_elegida, respuesta)
         
     db_client.Preguntas.find_one_and_replace({"_id":oid}, pregunta_elegida)
     pregunta_formateada = _format_document(pregunta_elegida)
@@ -299,7 +272,7 @@ def view_question_for_id(id:str) -> Dict:
     if not pregunta:
         _sin_preguntas()
     pregunta_formateada = _format_document(pregunta)
-    return pregunta
+    return pregunta_formateada
 
 def _validate_question(dato: Question):
     """Funcion orquestadora de validaciones"""
