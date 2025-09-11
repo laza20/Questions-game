@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from db.models.questions import Question, QuestionRequest,QuestionAnswer,Respuesta
+from db.models.usuario_player import RespuestaUsuario
 from service import service_questions
 from fastapi import status, Body
 from fastapi import APIRouter
@@ -72,13 +73,14 @@ async def play_duel_category_router(categoria:str, current_user: dict = Depends(
     question = service_questions.play_duel_category(categoria)
     return question
 
-@router.patch("/Responder/Pregunta", response_model=Respuesta, status_code=status.HTTP_202_ACCEPTED)
+@router.patch("/Responder/Pregunta", response_model=RespuestaUsuario, status_code=status.HTTP_202_ACCEPTED)
 async def aswer_question(respuesta:dict = Body(...), current_user: dict = Depends(get_current_user)):
     """
     End point para responder una pregunta.
     """
-    question = service_questions.aswer_one_question(respuesta)
-    return question
+    question, usuario = service_questions.aswer_one_question(respuesta, current_user)
+    
+    return {"usuario": usuario, "respuesta": question}
 
 @router.get("/Ver/Por/{id}", response_model=Question, status_code=status.HTTP_202_ACCEPTED)
 async def view_for_id(id: str,  current_user: dict = Depends(get_current_user)):
