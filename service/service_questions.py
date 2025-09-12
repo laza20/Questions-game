@@ -1,4 +1,5 @@
 from utils import funcion_nivel_pregunta
+from datetime import datetime, timezone
 import re
 from typing import Dict, List
 from fastapi import HTTPException, status
@@ -288,9 +289,16 @@ def aswer_one_question(respuesta:dict, current_user:dict) -> Dict:
             return_document=True 
         )
     else:
-        # If no update logic was triggered, just find the user
         usuario_modificado = db_client.Usuarios.find_one({"_id": current_user["_id"]})
-
+        
+    if respuesta_acertada == "CORRECTA":
+        puntos = puntos_positivos
+    else:
+        puntos = puntos_negativos
+        
+    dict_pregunta_respondida = _conformar_dict_preg_respondida(current_user, pregunta_elegida, respuesta, respuesta_acertada, puntos)
+    
+    db_client.Preguntas_respondidas.insert_one(dict_pregunta_respondida).inserted_id
     usuario_formateado = db_helpers.transformar_id(usuario_modificado)
     pregunta_formateada = _format_document(pregunta_elegida)
     pregunta_formateada["respuesta_acertada"] = respuesta_acertada
@@ -320,6 +328,15 @@ def _validate_question(dato: Question):
     
     return dato.nivel
 
+def _conformar_dict_preg_respondida(current_user, pregunta_elegida, respuesta, respuesta_acertada, puntos):
+    dict_pregunta_respondida = {}
+    dict_pregunta_respondida = {"id_usuario":current_user["_id"],
+        "id_pregunta"           : pregunta_elegida["_id"],
+        "respuesta_del_usuario" : respuesta["respuesta_correcta"],
+        "respuesta"             : respuesta_acertada,
+        "puntos_obtenidos"      : puntos,
+        "timestamp" : datetime.now(timezone.utc)}
+    return dict_pregunta_respondida
         
 def _verificar_respuesta_correcta(dato: Question):
     """Funcion que verifica que la respuesta correcta esta entre las opciones proporcionadas."""
