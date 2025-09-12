@@ -1,13 +1,18 @@
-from typing import Optional
-from pydantic import BaseModel
-
+from datetime import datetime, timezone
+from pydantic import BaseModel, Field
 
 class PreguntasRespondidas(BaseModel):
-    id             : Optional[str] = None
-    id_usuario     : Optional[str] = None
-    id_pregunta    : Optional[str] = None
-    cat_preg       : Optional[str] = None
-    sub_cat_preg   : Optional[str] = None
-    micro_cat_preg : Optional[str] = None
-    nano_cat_preg  : Optional[str] = None
+    id                    : str = Field(None, alias="_id")
+    id_usuario            : str
+    id_pregunta           : str
+    respuesta_del_usuario : str
+    respuesta             : str
+    puntos_obtenidos      : int
+    timestamp             : datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    
+class CategoriasPorcentajes(BaseModel):
+    categoria : str
+    cantidad_de_preguntas:int
+    porcentaje_de_aciertos:int
+    
     
