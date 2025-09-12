@@ -281,11 +281,15 @@ def aswer_one_question(respuesta:dict, current_user:dict) -> Dict:
     else:
         updates = {} 
 
-    usuario_modificado = db_client.Usuarios.find_one_and_update(
-        {"_id": current_user["_id"]},
-        updates,
-        return_document=True 
-    )
+    if updates:
+        usuario_modificado = db_client.Usuarios.find_one_and_update(
+            {"_id": current_user["_id"]},
+            updates,
+            return_document=True 
+        )
+    else:
+        # If no update logic was triggered, just find the user
+        usuario_modificado = db_client.Usuarios.find_one({"_id": current_user["_id"]})
 
     usuario_formateado = db_helpers.transformar_id(usuario_modificado)
     pregunta_formateada = _format_document(pregunta_elegida)
