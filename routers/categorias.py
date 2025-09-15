@@ -51,3 +51,10 @@ async def actualizar_id(current_user: dict = Depends(is_tercer_rango)):
     End point que permite actualizar el id de str a Object id
     """
     service_categorias.modificar_id()
+    
+@router.patch("/Actualizar/Estructura", status_code=status.HTTP_202_ACCEPTED)
+async def actualizar_estructura():
+    """
+    End point que permite actualizar la estructura de los documentos de categoria.
+    """
+    service_categorias.modificar_estructura()

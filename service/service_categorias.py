@@ -121,6 +121,21 @@ def modificar_id():
     else:
         HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Error al modificar los oid")
 
+def modificar_estructura():
+    # 1. Encuentra las categorías principales
+    categorias_principales = list(db_client.Categorias.find({"grado": "Primer"}))
+
+    if not categorias_principales:
+        _sin_categorias()
+        
+    # 2. Itera sobre ellas y actualiza el documento en la base de datos
+    for categoria in categorias_principales:
+        # Usa $set para agregar o modificar el campo padre_id a null
+        db_client.Categorias.update_one(
+            {"_id": categoria["_id"]},
+            {"$set": {"padre_id": None}}
+        )
+
 """ Fin de llamadas al usuario """
 
 
