@@ -11,8 +11,10 @@ class PreguntasRespondidas(BaseModel):
     timestamp             : datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     
 class CategoriasPorcentajes(BaseModel):
-    categoria : str
-    cantidad_de_preguntas:int
-    porcentaje_de_aciertos:int
-    
+    categoria             : str
+    cantidad_de_preguntas : int
+    preguntas_acertadas   : int
+    preguntas_erradas     : int
+    porcentajes           : float
+
     
