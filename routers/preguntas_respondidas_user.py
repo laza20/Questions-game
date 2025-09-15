@@ -22,3 +22,11 @@ async def view_categories_characters( current_user: dict = Depends(get_current_u
     porcentajes = service_preguntas_respondidas.view_categories_principals(current_user)
     return porcentajes
 
+@router.get("/Porcentaje/Categorias/{categoria}",response_model=CategoriasPorcentajes, status_code=status.HTTP_202_ACCEPTED)
+async def view_categories_name_category( categoria:str, current_user: dict = Depends(get_current_user)):
+    """
+    End point con la finalidad de mostrar los porcentajes de respuestas de usuario en una categoria determinada.
+    """
+    porcentajes = service_preguntas_respondidas.ver_porcentajes_categoria_particular(current_user, categoria)
+    return porcentajes
+
