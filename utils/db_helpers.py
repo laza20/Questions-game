@@ -96,10 +96,6 @@ def identificar_categoria_con_graphlookup(categoria_id: str):
     buscando en la jerarquía de categorías.
     """
     try:
-        # Step 1: Validate the input ID
-        print(categoria_id)
-        
-        
         # Step 2: Find the category to check if it exists
         categoria_actual = db_client.Categorias.find_one({"_id": categoria_id})
 
@@ -131,6 +127,37 @@ def identificar_categoria_con_graphlookup(categoria_id: str):
         raise e
     except Exception as e:
         # Catch any other unexpected errors
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Ocurrió un error inesperado: {e}"
+        )
+        
+        
+def identificar_categorias_descentes_con_graphlookup(categoria_id: str):
+    """
+    Función para identificar las categoría inferiores de una pregunta
+    buscando en la jerarquía de categorías.
+    """
+    try:
+        categoria_object_id = ObjectId(categoria_id)
+        categoria_actual = db_client.Categorias.find_one({"_id": categoria_object_id})
+
+        if not categoria_actual:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"La categoría con ID '{categoria_id}' no existe."
+            )
+        descendant_docs = graphlookups.get_all_descendants(categoria_id)
+
+        descendant_ids = {doc["_id"] for doc in descendant_docs}
+        
+        descendant_ids.add(categoria_object_id)
+
+        return descendant_ids
+        
+    except HTTPException as e:
+        raise e
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Ocurrió un error inesperado: {e}"
