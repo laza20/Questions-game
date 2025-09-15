@@ -61,13 +61,14 @@ def view_categories_principals(current_user):
         total = correcta + incorrecta
         if total != 0:
             porcentajes = correcta / total
+            porcentaje_final = round(porcentajes*100,2)
         else:
-            porcentajes = 0
+            porcentaje_final = 0
         dict_porcentajes={"categoria":nombre_categoria,
                         "cantidad_de_preguntas":total,
                         "preguntas_acertadas":correcta,
                         "preguntas_erradas": incorrecta,
-                        "porcentajes": porcentajes}
+                        "porcentajes": porcentaje_final}
         
         lista_porcentajes.append(dict_porcentajes)
         
