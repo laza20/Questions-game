@@ -110,3 +110,33 @@ def get_main_category(subcategory_id: str):
     return main_category
 
 
+def get_all_descendants(parent_id: str):
+    """
+    Funcion que busca las categorias inferiores.
+    """
+    try:
+        parent_object_id = ObjectId(parent_id)
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="ID invalido.")
+
+    pipeline = [
+        {"$match": {"_id": parent_object_id}},
+        {"$graphLookup": {
+            "from": "Categorias",
+            "startWith": "$_id", # Start the search from the parent's ID
+            "connectFromField": "_id", # Connect from the current document's ID
+            "connectToField": "padre_id", # Connect to documents whose padre_id matches
+            "as": "descendants",
+            "maxDepth": 10
+        }}
+    ]
+
+    result = list(db_client.Categorias.aggregate(pipeline))
+    
+    if not result:
+        return []
+
+    # The descendants are in the 'descendants' array of the first result document
+    descendants = result[0].get("descendants", [])
+
+    return descendants
