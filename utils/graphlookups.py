@@ -68,4 +68,45 @@ def get_all_descendant_ids_second_level(parent_id: ObjectId) -> list[ObjectId]:
     result = list(db_client.Categorias.aggregate(pipeline)) # Agrega los los ids a una lista
     return result[0]['all_ids'] if result else [parent_id] # retorna los ids para utilizarlos en el match
 
+def get_main_category(subcategory_id: str):
+    """
+    Funcion encargada de buscar la categoria principal de una categoria inferior."
+    """
+    try:
+        # 1. Validate the input ID
+        category_object_id = ObjectId(subcategory_id)
+    except Exception:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid category ID.")
+
+    # 2. Use $graphLookup to get the entire ancestry path
+    pipeline = [
+        {"$match": {"_id": category_object_id}},
+        {"$graphLookup": {
+            "from": "Categorias",
+            "startWith": "$padre_id",
+            "connectFromField": "padre_id",
+            "connectToField": "_id",
+            "as": "ancestry_path",
+            "maxDepth": 10
+        }}
+    ]
+    
+    result = list(db_client.Categorias.aggregate(pipeline))
+
+    if not result:
+        # This means the initial category was not found
+        return None
+
+    # The result should contain the starting document and the ancestry path
+    ancestry_path = result[0].get("ancestry_path", [])
+
+    # If the ancestry path is empty, it means the category is already a top-level parent
+    if not ancestry_path:
+        return result[0]
+        
+    # The last element in the ancestry path is the main category
+    main_category = ancestry_path[-1]
+
+    return main_category
+
 
