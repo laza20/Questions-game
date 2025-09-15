@@ -15,6 +15,7 @@ def get_categoria_id(referencia_categoria: str):
         oid = ObjectId(referencia_categoria)
         # Si tiene éxito, busca por ID.
         documento = db_client.Categorias.find_one({"_id": oid})
+        print(documento)
         if not documento:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -42,6 +43,11 @@ def get_name_category(oid):
     categoria = db_client.Categorias.find_one({"_id":oid})
     nombre_categoria = categoria["nombre"]
     return nombre_categoria
+
+def get_id_category(nombre):
+    categoria = db_client.Categorias.find_one({"nombre":nombre})
+    id_categoria = categoria["_id"]
+    return id_categoria
     
     
 def transformar_id(doc: Dict) -> Dict:
@@ -82,6 +88,53 @@ def seleccionar_pregunta_con_graphlookup(categoria_elegida: str, nivel_elegido: 
     ]
     documentos = list(coleccion.aggregate(pipeline))
     return documentos
+
+
+def identificar_categoria_con_graphlookup(categoria_id: str):
+    """
+    Función para identificar la categoría principal de una pregunta
+    buscando en la jerarquía de categorías.
+    """
+    try:
+        # Step 1: Validate the input ID
+        print(categoria_id)
+        
+        
+        # Step 2: Find the category to check if it exists
+        categoria_actual = db_client.Categorias.find_one({"_id": categoria_id})
+
+        if not categoria_actual:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"La categoría con ID '{categoria_id}' no existe."
+            )
+
+        # Step 3: Check if the category is already a top-level parent
+        if categoria_actual.get("padre_id") is None:
+            return categoria_actual
+
+        # Step 4: If it has a parent, use graphLookup to find the ultimate ancestor
+        # The get_main_category function already handles the entire hierarchy traversal
+        categoria_principal = graphlookups.get_main_category(categoria_id)
+        
+        if not categoria_principal:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"No se encontró la categoría principal para el ID '{categoria_id}'."
+            )
+            
+        print(f"Categoría principal encontrada: {categoria_principal['nombre']}")
+        return categoria_principal
+        
+    except HTTPException as e:
+        # Re-raise the HTTPException
+        raise e
+    except Exception as e:
+        # Catch any other unexpected errors
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Ocurrió un error inesperado: {e}"
+        )
         
 def asignacion_de_puntos_a_pregunta(pregunta_elegida, respuesta):
     puntos = pregunta_elegida["puntos_pregunta"]
