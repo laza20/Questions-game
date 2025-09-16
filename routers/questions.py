@@ -6,7 +6,7 @@ from fastapi import status, Body
 from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
 from fastapi import APIRouter, Depends
-from dependencias import get_current_user 
+from dependencias import get_current_user, is_segundo_rango, is_tercer_rango, is_primer_rango
 
 
 
@@ -17,7 +17,7 @@ router = APIRouter(prefix="/Preguntas",
 base_de_datos = "Preguntas"
 
 @router.post("/Realizar/Carga", response_model=list[QuestionRequest], status_code=status.HTTP_201_CREATED)
-async def crear_questions_endpoint(question: list[Question] = Body(...), current_user: dict = Depends(get_current_user)):
+async def crear_questions_endpoint(question: list[Question] = Body(...), current_user: dict = Depends(is_tercer_rango)):
     """
     Crea una o varias categorías en la base de datos.
     """
@@ -25,7 +25,7 @@ async def crear_questions_endpoint(question: list[Question] = Body(...), current
     return nuevas_preguntas 
 
 @router.get("/Ver/Todo", response_model=list[Question], status_code=status.HTTP_202_ACCEPTED)
-async def view_old_categories(current_user: dict = Depends(get_current_user)):
+async def view_old_categories(current_user: dict = Depends(is_primer_rango)):
     """
     End point encargado de mostrar todos los documentos de preguntas
     """
@@ -33,7 +33,7 @@ async def view_old_categories(current_user: dict = Depends(get_current_user)):
     return preguntas
 
 @router.put("/Actualizar/Id", response_model=list[Question], status_code=status.HTTP_202_ACCEPTED)
-async def actualizar_id(current_user: dict = Depends(get_current_user)):
+async def actualizar_id(current_user: dict = Depends(is_primer_rango)):
     """
     End point que permite actualizar el id de str a Object id
     """
@@ -83,7 +83,7 @@ async def aswer_question(respuesta:dict = Body(...), current_user: dict = Depend
     return {"usuario": usuario, "respuesta": question}
 
 @router.get("/Ver/Por/{id}", response_model=Question, status_code=status.HTTP_202_ACCEPTED)
-async def view_for_id(id: str,  current_user: dict = Depends(get_current_user)):
+async def view_for_id(id: str,  current_user: dict = Depends(is_segundo_rango)):
     """
     End point que sirve para visualizar una pregunta por medio de su id
     """

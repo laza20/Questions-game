@@ -13,7 +13,7 @@ router = APIRouter(prefix="/Categoria",
 base_de_datos = "Categorias"
 
 @router.post("/Realizar/Carga", response_model=list[Categoria], status_code=status.HTTP_201_CREATED)
-async def crear_categorias_endpoint(categorias: list[Categoria] = Body(...), current_user: dict = Depends(get_current_user)):
+async def crear_categorias_endpoint(categorias: list[Categoria] = Body(...), current_user: dict = Depends(is_tercer_rango)):
     """
     End point encargado de crear una o varias categorías en la base de datos.
     """
@@ -22,7 +22,7 @@ async def crear_categorias_endpoint(categorias: list[Categoria] = Body(...), cur
 
 
 @router.get("/Ver/Todo", response_model=list[Categoria], status_code=status.HTTP_202_ACCEPTED)
-async def view_old_categories(current_user: dict = Depends(get_current_user)):
+async def view_old_categories(current_user: dict = Depends(is_primer_rango)):
     """
     End point encargado de mostrar todos los documentos de categorias
     """
@@ -38,7 +38,7 @@ async def view_data_by_grade(grado: str, current_user: dict = Depends(is_tercer_
     return categorias
     
 @router.get("/Ver/Por/Categoria/{padre_id}", response_model=list[Categoria], status_code=status.HTTP_202_ACCEPTED)
-async def view_data_by_padre_id(padre_id: str, current_user: dict = Depends(get_current_user)):
+async def view_data_by_padre_id(padre_id: str, current_user: dict = Depends(is_segundo_rango)):
     """
     End point que permite visionar una categoria por su grado.
     """
@@ -46,14 +46,14 @@ async def view_data_by_padre_id(padre_id: str, current_user: dict = Depends(get_
     return categorias
 
 @router.put("/Actualizar/Id", response_model=list[Categoria], status_code=status.HTTP_202_ACCEPTED)
-async def actualizar_id(current_user: dict = Depends(is_tercer_rango)):
+async def actualizar_id(current_user: dict = Depends(is_primer_rango)):
     """
     End point que permite actualizar el id de str a Object id
     """
     service_categorias.modificar_id()
     
 @router.patch("/Actualizar/Estructura", status_code=status.HTTP_202_ACCEPTED)
-async def actualizar_estructura():
+async def actualizar_estructura(current_user: dict = Depends(is_primer_rango)):
     """
     End point que permite actualizar la estructura de los documentos de categoria.
     """
