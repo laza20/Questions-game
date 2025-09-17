@@ -54,6 +54,14 @@ def insertar_logros(logros: List[LogrosGenerales], current_user:dict) -> List[Di
             
     return documentos
 
+def ver_todos_los_logros()-> List[Dict]:
+    logros = list(db_client.Logros.find({"tipo":"Logro"}))
+    if not logros:
+        _sin_logro()
+        
+    logros_formateados = [_transformar_id(doc) for doc in logros]
+    return logros_formateados
+
 
 def _validaciones_logros(logro):
     regex = re.compile(re.escape(logro.descripcion), re.IGNORECASE)
