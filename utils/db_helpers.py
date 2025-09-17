@@ -194,3 +194,9 @@ def asignacion_de_puntos_a_pregunta(pregunta_elegida, respuesta):
         respuesta_acertada = "INCORRECTA"
         
     return pregunta_elegida, respuesta_acertada
+
+def sin_usuario():
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT, 
+        detail=f"No se encontrar al usuario necesario."
+        )
