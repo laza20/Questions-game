@@ -18,3 +18,14 @@ async def crear_categorias_endpoint(logros: list[LogrosGenerales] = Body(...), c
     """
     nuevos_logros = service_logros.insertar_logros(logros, current_user)
     return nuevos_logros
+
+@router.get("/Ver/Todo", response_model=list[LogrosGenerales], status_code=status.HTTP_202_ACCEPTED)
+async def  view_old(current_user: dict = Depends(get_current_user)):
+    """
+    End point para mostrar una lista con todos los logros.
+    """
+    logros_totales = service_logros.ver_todos_los_logros()
+    return logros_totales
+
+
+#ver por todo por nombre, ver logro particular -> por nombre, ver por condicion (tipo).
