@@ -67,6 +67,31 @@ def ver_todos_los_logros_sin_id()-> List[Dict]:
     if not logros:
         _sin_logro()
     
+    lista_logros_formateados = _modificar_muchos_idscreador_a_nombre(logros)
+
+    
+    return lista_logros_formateados
+
+def ver_logros_por_tipos(tipo):
+    logros = list(db_client.Logros.find({"tipo":"Logro"}))
+    if not logros:
+        _sin_logro()
+        
+    logros_lista = []
+    dict_logro = {}
+    for logro in logros:
+        if logro["condicion"]["tipo"] == tipo:
+            print(logro)
+            logros_lista.append(logro)
+    
+    if not logros_lista:
+        _sin_logro()
+    
+    lista_logros_formateados = _modificar_muchos_idscreador_a_nombre(logros_lista)
+        
+    return lista_logros_formateados
+    
+def _modificar_muchos_idscreador_a_nombre(logros):
     dict_logro = {}
     lista_logros_formateados = []
     for logro in logros:
@@ -76,9 +101,10 @@ def ver_todos_los_logros_sin_id()-> List[Dict]:
         dict_logro = dict(logro)
         dict_logro["creador"] = nombre_usuario
         lista_logros_formateados.append(dict_logro)
-    
+        
     return lista_logros_formateados
-
+        
+        
 def _modificar_idcreador_a_nombre_usuario(id_creador):
     usuario = db_client.Usuarios.find_one({"_id":id_creador})
     if not usuario:
