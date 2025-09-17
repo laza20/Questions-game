@@ -44,4 +44,12 @@ async def view_achievement_names(current_user: dict = Depends(get_current_user))
     logros_totales = service_logros.ver_todos_los_logros_sin_id()
     return logros_totales
 
+@router.get("/Ver/Por/Tipo/{tipo}", response_model=list[LogrosGeneralesSinIds], status_code=status.HTTP_202_ACCEPTED)
+async def view_achievement_types(tipo:str, current_user: dict = Depends(get_current_user)):
+    """
+    End point para ver todos los logros por tipo de logro.
+    """
+    logros_totales = service_logros.ver_logros_por_tipos(tipo)
+    return logros_totales
+
 #ver por todo por nombre, ver logro particular -> por nombre, ver por condicion (tipo).
