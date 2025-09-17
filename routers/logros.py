@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from db.models.logros import LogrosGenerales, LogrosUsuario, LogrosNames
+from db.models.logros import LogrosGenerales, LogrosUsuario, LogrosNames, LogrosGeneralesSinIds
 from service import service_logros
 from fastapi import HTTPException, status, Body
 from fastapi import APIRouter, Depends
@@ -19,8 +19,8 @@ async def crear_categorias_endpoint(logros: list[LogrosGenerales] = Body(...), c
     nuevos_logros = service_logros.insertar_logros(logros, current_user)
     return nuevos_logros
 
-@router.get("/Ver/Todo", response_model=list[LogrosGenerales], status_code=status.HTTP_202_ACCEPTED)
-async def  view_old(current_user: dict = Depends(get_current_user)):
+@router.get("/view/old", response_model=list[LogrosGenerales], status_code=status.HTTP_202_ACCEPTED)
+async def  view_old(current_user: dict = Depends(is_primer_rango)):
     """
     End point para mostrar una lista con todos los logros.
     """
@@ -35,5 +35,13 @@ async def view_achievement_names(current_user: dict = Depends(get_current_user))
     """
     nombres_logros = service_logros.ver_todos_los_logros()
     return nombres_logros
+
+@router.get("/Ver/Todo", response_model=list[LogrosGeneralesSinIds], status_code=status.HTTP_202_ACCEPTED)
+async def view_achievement_names(current_user: dict = Depends(get_current_user)):
+    """
+    End point para ver todos los logros sin ids(para usuarios generales).
+    """
+    logros_totales = service_logros.ver_todos_los_logros_sin_id()
+    return logros_totales
 
 #ver por todo por nombre, ver logro particular -> por nombre, ver por condicion (tipo).
