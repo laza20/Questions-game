@@ -10,6 +10,13 @@ class LogrosGenerales(BaseModel):
     creador_id: Optional[str] = None  # Referencia al usuario que lo creó
     condicion: Dict[str, Any] # Ej: {"tipo": "duelos_ganados", "valor": 100}
     
+class LogrosGeneralesSinIds(BaseModel):
+    nombre: str
+    descripcion: str
+    puntos: int
+    creador: str  # Referencia al usuario que lo creó
+    condicion: Dict[str, Any] # Ej: {"tipo": "duelos_ganados", "valor": 100}
+    
 class LogrosNames(BaseModel):
     nombre:str
     descripcion:str
