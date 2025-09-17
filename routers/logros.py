@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from db.models.logros import LogrosGenerales, LogrosUsuario
+from db.models.logros import LogrosGenerales, LogrosUsuario, LogrosNames
 from service import service_logros
 from fastapi import HTTPException, status, Body
 from fastapi import APIRouter, Depends
@@ -27,5 +27,13 @@ async def  view_old(current_user: dict = Depends(get_current_user)):
     logros_totales = service_logros.ver_todos_los_logros()
     return logros_totales
 
+
+@router.get("/Ver/Nombres", response_model=list[LogrosNames], status_code=status.HTTP_202_ACCEPTED)
+async def view_achievement_names(current_user: dict = Depends(get_current_user)):
+    """
+    End point para ver todos los logros, solamente sus nombres
+    """
+    nombres_logros = service_logros.ver_todos_los_logros()
+    return nombres_logros
 
 #ver por todo por nombre, ver logro particular -> por nombre, ver por condicion (tipo).
