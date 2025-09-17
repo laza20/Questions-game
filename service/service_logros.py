@@ -62,6 +62,30 @@ def ver_todos_los_logros()-> List[Dict]:
     logros_formateados = [_transformar_id(doc) for doc in logros]
     return logros_formateados
 
+def ver_todos_los_logros_sin_id()-> List[Dict]:
+    logros = list(db_client.Logros.find({"tipo":"Logro"}))
+    if not logros:
+        _sin_logro()
+    
+    dict_logro = {}
+    lista_logros_formateados = []
+    for logro in logros:
+        id_usuario = logro["creador_id"]
+        nombre_usuario = _modificar_idcreador_a_nombre_usuario(id_usuario)
+        del logro["creador_id"]
+        dict_logro = dict(logro)
+        dict_logro["creador"] = nombre_usuario
+        lista_logros_formateados.append(dict_logro)
+    
+    return lista_logros_formateados
+
+def _modificar_idcreador_a_nombre_usuario(id_creador):
+    usuario = db_client.Usuarios.find_one({"_id":id_creador})
+    if not usuario:
+        db_helpers.sin_usuario()
+        
+    nombre = usuario["nombre_usuario"]
+    return nombre
 
 def _validaciones_logros(logro):
     regex = re.compile(re.escape(logro.descripcion), re.IGNORECASE)
@@ -91,3 +115,5 @@ def _sin_logro():
         status_code=status.HTTP_409_CONFLICT, 
         detail=f"No se encontraron los logros necesarios"
         )
+    
+    
