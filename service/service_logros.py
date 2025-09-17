@@ -78,10 +78,8 @@ def ver_logros_por_tipos(tipo):
         _sin_logro()
         
     logros_lista = []
-    dict_logro = {}
     for logro in logros:
         if logro["condicion"]["tipo"] == tipo:
-            print(logro)
             logros_lista.append(logro)
     
     if not logros_lista:
