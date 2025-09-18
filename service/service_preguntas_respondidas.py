@@ -1,9 +1,4 @@
-from utils import funcion_nivel_pregunta
-from datetime import datetime, timezone
-import re
-from typing import Dict, List
 from fastapi import HTTPException, status
-from db.models.questions import Question
 from db.client import db_client
 from utils import (
     db_helpers, 
@@ -14,8 +9,7 @@ from utils import (
     funcion_niveles_usuario,
     puntos_usuario_por_pregunta
     )
-from exceptions import errores_simples
-import random
+
 
 def view_categories_principals(current_user) -> list[dict]:
     """
@@ -108,7 +102,7 @@ def ver_porcentajes_categoria_particular(current_user, categoria):
             "pregunta": pregunta,
             "nombre": nombre_categoria
         }
-        print(pregunta_por_categoria)
+
         
         lista_preguntas.append(pregunta_por_categoria)
     
