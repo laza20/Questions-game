@@ -13,6 +13,12 @@ class PreguntasCreadas(BaseModel):
 class Favorito(BaseModel):
     id_categoria : Optional[str] = None
 
+class Progreso(BaseModel):
+    preguntas_correctas         :Optional[int] = 0
+    preguntas_faciles_correctas :Optional[int] = 0
+    preguntas_deportes_correctas:Optional[int] = 0
+    duelos_ganados              :Optional[int] = 0
+    preguntas_creadas           :Optional[int] = 0
 
 
 class Control(BaseModel):
@@ -36,6 +42,7 @@ class Usuario(BaseModel):
     descripcion      : Optional[str] = None
     stats            : Stats = Field(default_factory=Stats)
     logros           : Optional[List[str]] = Field(default_factory=list)
+    progreso         : Optional[Progreso]
     favoritos        : Optional[List[Favorito]] = Field(default_factory=list)
     preguntas        : Optional[List[PreguntasCreadas]] = Field(default_factory=list)
     control          : Control = Field(default_factory=Control)
