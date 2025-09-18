@@ -4,6 +4,7 @@ import re
 from typing import Dict, List
 from fastapi import HTTPException, status
 from db.models.questions import Question
+from service import service_conexion_logros
 from db.client import db_client
 from utils import (
     db_helpers, 
@@ -262,7 +263,7 @@ def aswer_one_question(respuesta:dict, current_user:dict) -> Dict:
     pregunta_elegida["categoria_id"] = db_helpers.get_name_category(pregunta_elegida["categoria_id"])
     
  
-    pregunta_elegida, respuesta_acertada = db_helpers.asignacion_de_puntos_a_pregunta(pregunta_elegida, respuesta)
+    pregunta_elegida, respuesta_acertada = db_helpers.asignar_puntos_y_nivel(pregunta_elegida, respuesta)
     
         
     db_client.Preguntas.find_one_and_replace({"_id":oid_respuesta}, pregunta_elegida)
@@ -302,6 +303,8 @@ def aswer_one_question(respuesta:dict, current_user:dict) -> Dict:
     usuario_formateado = db_helpers.transformar_id(usuario_modificado)
     pregunta_formateada = _format_document(pregunta_elegida)
     pregunta_formateada["respuesta_acertada"] = respuesta_acertada
+        
+    service_conexion_logros.orquestador_logros(current_user)
 
     return pregunta_formateada, usuario_formateado
 
