@@ -163,37 +163,33 @@ def identificar_categorias_descentes_con_graphlookup(categoria_id: str):
             detail=f"Ocurrió un error inesperado: {e}"
         )
         
-def asignacion_de_puntos_a_pregunta(pregunta_elegida, respuesta):
-    puntos = pregunta_elegida["puntos_pregunta"]
-    if pregunta_elegida["respuesta_correcta"] == respuesta["respuesta_correcta"]:
-        
-        if pregunta_elegida["consecutiva"] <= 0:
-            pregunta_elegida["puntos_pregunta"] -= 10
-            pregunta_elegida["consecutiva"] = 0
-            pregunta_elegida["consecutiva"] += 1
-            pregunta_elegida["nivel"] = funcion_nivel_pregunta.cargar_nivel_pregunta(puntos)
-        else: 
-            pregunta_elegida["puntos_pregunta"] -= 20
-            pregunta_elegida["consecutiva"] += 1
-            pregunta_elegida["nivel"] = funcion_nivel_pregunta.cargar_nivel_pregunta(puntos)
-        
-        respuesta_acertada = "CORRECTA"
-        
-        
-    if pregunta_elegida["respuesta_correcta"] != respuesta["respuesta_correcta"]:
-        if pregunta_elegida["consecutiva"] >= 0:
-            pregunta_elegida["puntos_pregunta"] += 10
-            pregunta_elegida["consecutiva"] = 0
-            pregunta_elegida["consecutiva"] -= 1
-            pregunta_elegida["nivel"] = funcion_nivel_pregunta.cargar_nivel_pregunta(puntos)
+def asignar_puntos_y_nivel(pregunta_elegida, respuesta):
+    
+    es_correcta = pregunta_elegida["respuesta_correcta"] == respuesta["respuesta_correcta"]
+    
+    puntos_actuales = pregunta_elegida["puntos_pregunta"]
+    racha_actual = pregunta_elegida["consecutiva"] 
+    
+    if es_correcta:
+        if racha_actual < 0:
+            pregunta_elegida["consecutiva"] = 1
         else:
-            pregunta_elegida["puntos_pregunta"] += 20
+            pregunta_elegida["consecutiva"] += 1
+
+        ajuste = 20 if abs(racha_actual) > 1 else 10
+        pregunta_elegida["puntos_pregunta"] = max(0, puntos_actuales - ajuste)
+    else:
+        if racha_actual > 0:
+            pregunta_elegida["consecutiva"] = -1
+        else:
             pregunta_elegida["consecutiva"] -= 1
-            pregunta_elegida["nivel"] = funcion_nivel_pregunta.cargar_nivel_pregunta(puntos)
+
+        ajuste = 20 if abs(racha_actual) > 1 else 10
+        pregunta_elegida["puntos_pregunta"] = min(1000, puntos_actuales + ajuste)
         
-        respuesta_acertada = "INCORRECTA"
-        
-    return pregunta_elegida, respuesta_acertada
+    pregunta_elegida["nivel"] = funcion_nivel_pregunta.cargar_nivel_pregunta(pregunta_elegida["puntos_pregunta"])
+    
+    return pregunta_elegida, "CORRECTA" if es_correcta else "INCORRECTA"
 
 def sin_usuario():
     raise HTTPException(
