@@ -42,7 +42,7 @@ class Usuario(BaseModel):
     descripcion      : Optional[str] = None
     stats            : Stats = Field(default_factory=Stats)
     logros           : Optional[List[str]] = Field(default_factory=list)
-    progreso         : Optional[Progreso]
+    progreso         : Optional[Progreso] = Field(default_factory=list)
     favoritos        : Optional[List[Favorito]] = Field(default_factory=list)
     preguntas        : Optional[List[PreguntasCreadas]] = Field(default_factory=list)
     control          : Control = Field(default_factory=Control)
