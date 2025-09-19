@@ -270,6 +270,7 @@ def aswer_one_question(respuesta:dict, current_user:dict) -> Dict:
     nivel_pregunta = pregunta_elegida["nivel"]
     puntos_positivos, puntos_negativos = puntos_usuario_por_pregunta.puntos_por_nivel_pregunta(nivel_pregunta)
     if respuesta_acertada == "CORRECTA":
+        _actualizar_progreso(pregunta_elegida, current_user, nivel_pregunta)
         puntos_a_sumar = puntos_positivos 
         nivel = funcion_niveles_usuario.niveles_usuario(current_user["stats"]["puntos_xp"])
         updates = {
@@ -304,7 +305,7 @@ def aswer_one_question(respuesta:dict, current_user:dict) -> Dict:
     pregunta_formateada = _format_document(pregunta_elegida)
     pregunta_formateada["respuesta_acertada"] = respuesta_acertada
         
-    service_conexion_logros.orquestador_logros(current_user)
+    service_conexion_logros.orquestador_logros(current_user, "pregunta_respondida", pregunta_formateada)
 
     return pregunta_formateada, usuario_formateado
 
@@ -330,6 +331,43 @@ def _validate_question(dato: Question):
         dato.nivel = nivel
     
     return dato.nivel
+
+def _actualizar_progreso(pregunta, current_user, nivel_pregunta):
+    id_categoria = db_helpers.get_categoria_id(pregunta["categoria_id"])
+    categoria_principal = db_helpers.identificar_categoria_con_graphlookup(id_categoria)
+    nombre_categoria = categoria_principal["nombre"]
+    
+    updates = {}
+    updates["progreso.preguntas_correctas"] = 1
+    
+    dificultad_map = {
+        "Muy facil": "preguntas_muy_faciles_correctas",
+        "Facil": "preguntas_faciles_correctas",
+        "Medio": "preguntas_medio_correctas",
+        "Dificil": "preguntas_dificil_correctas",
+        "Imposible": "preguntas_imposible_correctas",
+        "Infinito": "preguntas_infinito_correctas"
+    }
+    campo_dificultad = dificultad_map.get(nivel_pregunta)
+    if campo_dificultad:
+        updates[f"progreso.{campo_dificultad}"] = 1
+
+    categoria_map = {
+        "Entretenimiento": "preguntas_entretenimiento_correctas",
+        "ciencia": "preguntas_ciencia_correctas",
+        "historia": "preguntas_historia_correctas",
+        "cultura general": "preguntas_cultura_general_correctas",
+        "deportes": "preguntas_deportes_correctas"
+    }
+    campo_categoria = categoria_map.get(nombre_categoria)
+    if campo_categoria:
+        updates[f"progreso.{campo_categoria}"] = 1
+        
+    db_client.Usuarios.update_one(
+        {"_id": current_user["_id"]},
+        {"$inc": updates}
+    )
+
 
 def _conformar_dict_preg_respondida(current_user, pregunta_elegida, respuesta, respuesta_acertada, puntos):
     dict_pregunta_respondida = {}
