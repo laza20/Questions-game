@@ -119,7 +119,6 @@ def identificar_categoria_con_graphlookup(categoria_id: str):
                 detail=f"No se encontró la categoría principal para el ID '{categoria_id}'."
             )
             
-        print(f"Categoría principal encontrada: {categoria_principal['nombre']}")
         return categoria_principal
         
     except HTTPException as e:
