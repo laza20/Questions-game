@@ -14,11 +14,20 @@ class Favorito(BaseModel):
     id_categoria : Optional[str] = None
 
 class Progreso(BaseModel):
-    preguntas_correctas         :Optional[int] = 0
-    preguntas_faciles_correctas :Optional[int] = 0
-    preguntas_deportes_correctas:Optional[int] = 0
-    duelos_ganados              :Optional[int] = 0
-    preguntas_creadas           :Optional[int] = 0
+    preguntas_correctas                :Optional[int] = 0
+    preguntas_muy_faciles_correctas    :Optional[int] = 0
+    preguntas_faciles_correctas        :Optional[int] = 0
+    preguntas_medio_correctas          :Optional[int] = 0
+    preguntas_dificil_correctas        :Optional[int] = 0
+    preguntas_imposible_correctas      :Optional[int] = 0
+    preguntas_infinito_correctas       :Optional[int] = 0
+    preguntas_deportes_correctas       :Optional[int] = 0
+    preguntas_ciencia_correctas        :Optional[int] = 0
+    preguntas_cultura_general_correctas:Optional[int] = 0
+    preguntas_entretenimiento_correctas:Optional[int] = 0
+    preguntas_historia_correctas       :Optional[int] = 0
+    duelos_ganados                     :Optional[int] = 0
+
 
 
 class Control(BaseModel):
@@ -42,7 +51,7 @@ class Usuario(BaseModel):
     descripcion      : Optional[str] = None
     stats            : Stats = Field(default_factory=Stats)
     logros           : Optional[List[str]] = Field(default_factory=list)
-    progreso         : Optional[Progreso] = Field(default_factory=list)
+    progreso         : Optional[Progreso] = Field(default_factory=Progreso)
     favoritos        : Optional[List[Favorito]] = Field(default_factory=list)
     preguntas        : Optional[List[PreguntasCreadas]] = Field(default_factory=list)
     control          : Control = Field(default_factory=Control)
