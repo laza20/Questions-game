@@ -195,3 +195,10 @@ def sin_usuario():
         status_code=status.HTTP_409_CONFLICT, 
         detail=f"No se encontrar al usuario necesario."
         )
+    
+    
+def verificador_nivel(campo_dificultad):
+    if " " in campo_dificultad:
+        campo_dificultad = campo_dificultad.lower().replace(" ", "_")
+        
+    return campo_dificultad
