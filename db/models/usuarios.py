@@ -15,8 +15,8 @@ class Favorito(BaseModel):
 
 class Progreso(BaseModel):
     preguntas_correctas                :Optional[int] = 0
-    preguntas_muy_faciles_correctas    :Optional[int] = 0
-    preguntas_faciles_correctas        :Optional[int] = 0
+    preguntas_muy_facil_correctas      :Optional[int] = 0
+    preguntas_facil_correctas          :Optional[int] = 0
     preguntas_medio_correctas          :Optional[int] = 0
     preguntas_dificil_correctas        :Optional[int] = 0
     preguntas_imposible_correctas      :Optional[int] = 0
