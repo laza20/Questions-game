@@ -12,7 +12,19 @@ def orquestador_logros(current_user, evento, datos_evento):
             verificador_preguntas_correctas(usuario_actualizado)
             logros_niveles(usuario_actualizado, campo_dificultad_final)
             logros_categorias(usuario_actualizado, campo_categoria)
+            logros_puntos(usuario_actualizado)
 
+
+def logros_puntos(current_user):
+    """
+    Funcion encargada de obtener:
+    los puntos totales de un usuario (stats).
+    los logros de condicion.tipo: puntos_totales
+    """
+    logros_nivel = list(db_client.Logros.find({"condicion.tipo": "puntos_totales"}))
+    contador = current_user["stats"]["puntos_xp"]
+    otorgar_logro(current_user, logros_nivel, contador)
+    return current_user
 
 def logros_niveles(current_user, campo_dificultad):
     """
