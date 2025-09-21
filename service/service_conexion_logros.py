@@ -25,7 +25,6 @@ def logros_nivel_usuario(current_user):
         logro for logro in db_client.Logros.find({"condicion.tipo": "nivel"})
         if logro["condicion"]["valor"] != "maximo"
         ]
-    print(logros_por_nivel_usuario)
     contador = current_user["stats"]["nivel"]
     otorgar_logro(current_user, logros_por_nivel_usuario, contador)
     return current_user
