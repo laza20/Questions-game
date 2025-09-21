@@ -340,33 +340,17 @@ def _actualizar_progreso(pregunta, current_user, nivel_pregunta):
     updates = {}
     updates["progreso.preguntas_correctas"] = 1
     
-    dificultad_map = {
-        "Muy facil": "preguntas_muy_faciles_correctas",
-        "Facil": "preguntas_faciles_correctas",
-        "Medio": "preguntas_medio_correctas",
-        "Dificil": "preguntas_dificil_correctas",
-        "Imposible": "preguntas_imposible_correctas",
-        "Infinito": "preguntas_infinito_correctas"
-    }
-    campo_dificultad = dificultad_map.get(nivel_pregunta)
-    if campo_dificultad:
-        updates[f"progreso.{campo_dificultad}"] = 1
+    campo_categoria = f"progreso.preguntas_{nombre_categoria}_correctas"
+    updates[campo_categoria] = 1
 
-    categoria_map = {
-        "Entretenimiento": "preguntas_entretenimiento_correctas",
-        "ciencia": "preguntas_ciencia_correctas",
-        "historia": "preguntas_historia_correctas",
-        "cultura general": "preguntas_cultura_general_correctas",
-        "deportes": "preguntas_deportes_correctas"
-    }
-    campo_categoria = categoria_map.get(nombre_categoria)
-    if campo_categoria:
-        updates[f"progreso.{campo_categoria}"] = 1
-        
+    campo_dificultad_normalizado = db_helpers.verificador_nivel(nivel_pregunta)
+    campo_dificultad_final = f"progreso.preguntas_{campo_dificultad_normalizado}_correctas"
+    updates[campo_dificultad_final] = 1
     db_client.Usuarios.update_one(
         {"_id": current_user["_id"]},
         {"$inc": updates}
     )
+
 
 
 def _conformar_dict_preg_respondida(current_user, pregunta_elegida, respuesta, respuesta_acertada, puntos):
