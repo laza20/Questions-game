@@ -1,57 +1,31 @@
 from db.client import db_client
+from utils import db_helpers
 
 def orquestador_logros(current_user, evento, datos_evento):
-    """
-    Funcion orquestadora, recibe, el usuario que esta jugando, 
-    el evento (pregunta respondida, duelo ganado) 
-    y datos del evento (categoria, respuesta)
-    """
     if evento == "pregunta_respondida":
-        es_correcta = datos_evento.get("es_correcta", False)
-        categoria   = datos_evento.get("categoria")
-        dificultad  = datos_evento.get("dificultad")
+        if datos_evento.get("respuesta_acertada") == "CORRECTA":
+            categoria = datos_evento.get("categoria")
+            dificultad = datos_evento.get("nivel")
+            if categoria:
+                campo_categoria = f"progreso.preguntas_{categoria}_correctas"
+            if dificultad:
+                campo_dificultad_normalizado = db_helpers.verificador_nivel(dificultad)
+                campo_dificultad_final = f"preguntas_{campo_dificultad_normalizado}_correctas"
+        
 
-    if es_correcta:
-        db_client.Usuarios.update_one(
-        {"_id": current_user["_id"]},
-        {"$inc": {"progreso.preguntas_correctas": 1}}
-        )
-
-    if categoria:
-        campo_categoria = f"progreso.preguntas_{categoria}_correctas"
-        db_client.Usuarios.update_one(
-        {"_id": current_user["_id"]},
-        {"$inc": {campo_categoria: 1}}
-        )
-    if dificultad:
-        campo_dificultad = f"progreso.preguntas_{dificultad}_correctas"
-        db_client.Usuarios.update_one(
-        {"_id": current_user["_id"]},
-        {"$inc": {campo_dificultad: 1}}
-        )
-
-    usuario_actualizado = db_client.Usuarios.find_one({"_id": current_user["_id"]})
-
-    verificador_preguntas_correctas(current_user)
-    _orquestador_niveles(current_user,datos_evento)
+            verificador_preguntas_correctas(current_user)
+            logros_niveles(current_user, campo_dificultad_final)
 
 
-def _orquestador_niveles(current_user, datos_evento):
-    nivel = datos_evento.get("nivel")
-    if not nivel:
-        return
+def logros_niveles(current_user, campo_dificultad):
+
     
-    mapping = {
-        "Muy facil": verificador_preguntas_muy_faciles_correctas,
-        "Facil": verificador_preguntas_faciles_correctas,
-        "Medio": verificador_preguntas_medias_correctas,
-        "Dificil": verificador_preguntas_dificiles_correctas,
-        "Imposible": verificador_preguntas_imposibles_correctas,
-        "Infinito": verificador_preguntas_infinitas_correctas,
-    }
+    logros_nivel = list(db_client.Logros.find({"condicion.tipo": campo_dificultad}))
+    contador = current_user["progreso"].get(campo_dificultad, 0)
     
-    if nivel in mapping:
-        mapping[nivel](current_user)
+    otorgar_logro(current_user, logros_nivel, contador)
+    
+    return current_user
 
 def verificador_preguntas_correctas(current_user):
     logros = list(db_client.Logros.find({"condicion.tipo": "preguntas_correctas"}))
@@ -61,53 +35,6 @@ def verificador_preguntas_correctas(current_user):
 
     return current_user
 
-def verificador_preguntas_muy_faciles_correctas(current_user):
-    logros = list(db_client.Logros.find({"condicion.tipo": "preguntas_muy_faciles_correctas"}))
-    contador = current_user["progreso"]["preguntas_muy_faciles_correctas"]
-
-    otorgar_logro(current_user, logros, contador)
-
-    return current_user
-
-def verificador_preguntas_faciles_correctas(current_user):
-    logros = list(db_client.Logros.find({"condicion.tipo": "preguntas_faciles_correctas"}))
-    contador = current_user["progreso"]["preguntas_faciles_correctas"]
-
-    otorgar_logro(current_user, logros, contador)
-
-    return current_user
-
-def verificador_preguntas_medias_correctas(current_user):
-    logros = list(db_client.Logros.find({"condicion.tipo": "preguntas_medias_correctas"}))
-    contador = current_user["progreso"]["preguntas_medias_correctas"]
-
-    otorgar_logro(current_user, logros, contador)
-
-    return current_user
-
-def verificador_preguntas_dificiles_correctas(current_user):
-    logros = list(db_client.Logros.find({"condicion.tipo": "preguntas_dificiles_correctas"}))
-    contador = current_user["progreso"]["preguntas_dificiles_correctas"]
-
-    otorgar_logro(current_user, logros, contador)
-
-    return current_user
-
-def verificador_preguntas_imposibles_correctas(current_user):
-    logros = list(db_client.Logros.find({"condicion.tipo": "preguntas_imposibles_correctas"}))
-    contador = current_user["progreso"]["preguntas_imposibles_correctas"]
-
-    otorgar_logro(current_user, logros, contador)
-
-    return current_user
-
-def verificador_preguntas_infinitas_correctas(current_user):
-    logros = list(db_client.Logros.find({"condicion.tipo": "preguntas_infinito_correctas"}))
-    contador = current_user["progreso"]["preguntas_infinito_correctas"]
-
-    otorgar_logro(current_user, logros, contador)
-
-    return current_user
 
 
 def otorgar_logro(current_user, logros, contador):
@@ -122,4 +49,5 @@ def otorgar_logro(current_user, logros, contador):
     {"$set": {"logros": current_user["logros"]}}
     )
     return current_user
+
  
