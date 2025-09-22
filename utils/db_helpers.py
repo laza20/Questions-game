@@ -50,11 +50,17 @@ def get_id_category(nombre):
     return id_categoria
     
     
-def transformar_id(doc: Dict) -> Dict:
+def transformar_id_documento(doc: Dict) -> Dict:
     """Funcion encargada de formatear el id para entregar un str en lugar de un object id."""
     if doc:
         doc["id"] = str(doc.pop("_id"))
     return doc
+
+def transformar_id(oid: ObjectId) -> str:
+    """Funcion encargada de formatear el id para entregar un str en lugar de un object id."""
+    id_str = str(oid)
+    return id_str
+
 
 def seleccionar_pregunta_con_graphlookup(categoria_elegida: str, nivel_elegido: str):
     """
