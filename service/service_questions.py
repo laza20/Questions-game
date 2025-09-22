@@ -19,7 +19,7 @@ from exceptions import errores_simples
 import random
 
 
-def insertar_question(preguntas: List[Question]) -> List[Dict]:
+def insertar_question(preguntas: List[Question], current_user: Dict) -> List[Dict]:
     """
     Función principal para validar e insertar una o varias preguntas.
     """
@@ -47,6 +47,7 @@ def insertar_question(preguntas: List[Question]) -> List[Dict]:
         documento = pregunta.model_dump(by_alias=True, exclude_none=True)
         
         documento["categoria_id"] = db_helpers.get_categoria_id(pregunta.categoria_id)
+        documento["usuario_carga"]      = current_user["_id"]
         documento.pop("id", None)
         documentos_a_insertar.append(documento)
         
@@ -391,6 +392,7 @@ def _format_document(doc: Dict) -> Dict:
     if doc:
         doc["id"] = str(doc.pop("_id"))
         doc["categoria_id"] = str(doc["categoria_id"])
+        doc["usuario_carga"] = str(doc["usuario_carga"])
     return doc
 
 def _sin_preguntas():
