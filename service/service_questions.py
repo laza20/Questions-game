@@ -302,7 +302,7 @@ def aswer_one_question(respuesta:dict, current_user:dict) -> Dict:
     dict_pregunta_respondida = _conformar_dict_preg_respondida(current_user, pregunta_elegida, respuesta, respuesta_acertada, puntos)
     
     db_client.Preguntas_respondidas.insert_one(dict_pregunta_respondida).inserted_id
-    usuario_formateado = db_helpers.transformar_id(usuario_modificado)
+    usuario_formateado = db_helpers.transformar_id_documento(usuario_modificado)
     pregunta_formateada = _format_document(pregunta_elegida)
     pregunta_formateada["respuesta_acertada"] = respuesta_acertada
         
