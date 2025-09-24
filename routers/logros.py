@@ -52,4 +52,8 @@ async def view_achievement_types(tipo:str, current_user: dict = Depends(get_curr
     logros_totales = service_logros.ver_logros_por_tipos(tipo)
     return logros_totales
 
-#ver por todo por nombre, ver logro particular -> por nombre, ver por condicion (tipo).
+@router.delete("/Eliminar/Logro/{id}}", response_model=list[LogrosGeneralesSinIds], status_code=status.HTTP_202_ACCEPTED)
+async def delete_achievement_by_id(id:str, current_user: dict = Depends(is_primer_rango)):
+    """
+    End point encargado de eliminar un logro por medio de su id
+    """
