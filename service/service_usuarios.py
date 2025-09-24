@@ -6,7 +6,7 @@ import os
 from typing import Dict, List
 from db.models.usuarios import Usuario
 from datetime import datetime, timedelta, timezone
-from utils import db_helpers
+from utils import db_helpers, funciones_logicas
 from db.client import db_client
 
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -52,7 +52,31 @@ def login_user(usuario:OAuth2PasswordRequestForm = Depends())-> str:
     
     return {"access_token": jwt.encode(acces_token,SECRET_KEY,algorithm=ALGORITHM), "token_type": "bearer"}
 
-
+def eliminar_logro(id_logro: str, current_user: dict) -> Dict:
+    """
+    Funcion encargada de eliminar un logro de un usuario.
+    """
+    oid_logro_a_eliminar = funciones_logicas.validate_object_id(id_logro)
+    if not oid_logro_a_eliminar:
+        _sin_logro()
+    resultado_actualizacion = db_client.Usuarios.update_one(
+        {"_id": current_user["_id"]},
+        {"$pull": {"logros": oid_logro_a_eliminar}}
+    )
+    
+    if resultado_actualizacion.modified_count == 1:
+        usuario_actualizado = db_client.Usuarios.find_one({"_id": current_user["_id"]})
+        
+        # This is the crucial step: convert ObjectIds to strings before returning
+        if usuario_actualizado and "logros" in usuario_actualizado:
+            usuario_actualizado["logros"] = [str(logro_id) for logro_id in usuario_actualizado["logros"]]
+            
+        return usuario_actualizado
+    else:
+        # Also, make sure to handle the case where the user object is returned without an update
+        if "logros" in current_user:
+            current_user["logros"] = [str(logro_id) for logro_id in current_user["logros"]]
+        return current_user
 
 def _validacion_usuario(user:Usuario):
     
@@ -67,3 +91,9 @@ def _format_document(doc: Dict) -> Dict:
     if doc:
         doc["id"] = str(doc.pop("_id"))
     return doc
+
+def _sin_logro():
+    raise HTTPException(
+        status_code=status.HTTP_409_CONFLICT, 
+        detail=f"No se encontrar al usuario necesario."
+        )
