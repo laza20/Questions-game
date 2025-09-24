@@ -89,6 +89,37 @@ def ver_logros_por_tipos(tipo):
         
     return lista_logros_formateados
     
+def view_logros_user_names(current_user: Dict) -> Dict:
+    """
+    Función encargada de obtener el nombre y descripción de los logros de un usuario.
+    """
+    logros_ids = current_user.get("logros", [])
+
+    if not logros_ids:
+
+        return {
+            "nombre_usuario": current_user["nombre_usuario"],
+            "logros": []
+        }
+
+    lista_logros_detalles = list(db_client.Logros.find({"_id": {"$in": logros_ids}}))
+
+    logros_filtrados = [
+        {
+            "nombre": logro["nombre"],
+            "descripcion": logro["descripcion"]
+        }
+        for logro in lista_logros_detalles
+    ]
+    
+    respuesta_final = {
+        "usuario":{"nombre_usuario": current_user["nombre_usuario"],
+        "stats": current_user.get("stats", {})}, 
+        "logros": logros_filtrados
+    }
+    
+    return respuesta_final
+
 def _modificar_muchos_idscreador_a_nombre(logros):
     dict_logro = {}
     lista_logros_formateados = []
