@@ -68,10 +68,10 @@ async def view_achievement_user_names(current_user: dict = Depends(get_current_u
     return logros
 
 
-@router.get("/Ver/Logros/Totales/Usuario", response_model=list[LogrosGeneralesSinIds], status_code=status.HTTP_202_ACCEPTED)
-async def view_achievement_user_names(id:str, current_user: dict = Depends(get_current_user)):
+@router.get("/Ver/Logros/Totales/Usuario", response_model=list[LogrosGenerales], status_code=status.HTTP_202_ACCEPTED)
+async def view_achievement_user_names( current_user: dict = Depends(get_current_user)):
     """
     End point encargado de visualizar los logros de un usuario.
     """
-    logros = service_logros.view_logros_user()
+    logros = service_logros.view_logros_user(current_user)
     return logros
