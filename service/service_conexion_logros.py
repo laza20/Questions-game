@@ -2,7 +2,7 @@ from db.client import db_client
 from utils import db_helpers
 from bson.objectid import ObjectId
 
-def orquestador_logros(current_user, evento, datos_evento):
+def orquestador_logros(current_user:dict, evento:str, datos_evento:dict):
     usuario_actualizado = db_client.Usuarios.find_one({"_id":current_user["_id"]})
     if evento == "pregunta_respondida":
         if datos_evento.get("respuesta_acertada") == "CORRECTA":
@@ -10,8 +10,38 @@ def orquestador_logros(current_user, evento, datos_evento):
             logros_preguntas(usuario_actualizado)
             logros_puntos(usuario_actualizado)
             logros_nivel_usuario(usuario_actualizado)
+    
+    if evento == "pregunta_creada":
+        logros_creacion_preguntas(usuario_actualizado)
+            
+            
+def logros_creacion_preguntas(current_user:dict):
+    """
+    Función encargada de verificar las preguntas creadas por el usuario y otorgar un logro en base a esto.
+    """
+    logros_preguntas_creadas = list(db_client.Logros.find({"condicion.tipo": "preguntas_creadas"}))
+    if current_user["nombre_usuario"] == "lazasalvi20":
+        preguntas = list(db_client.Preguntas.find({"usuario_carga": "Master"}))
+        preguntas_dos  = list(db_client.Preguntas.find({"usuario_carga": "lazasalvi20"}))
+        contador = len(preguntas) + len(preguntas_dos)
+    else:
+        preguntas_usuario = list(db_client.Preguntas.find({"usuario_carga":current_user["nombre_usuario"]}))
+        contador = len(preguntas_usuario)
+        
+    lista_logros = []
+            
+    for logro in logros_preguntas_creadas:
+        if contador >= logro["condicion"]["valor"]:
+            lista_logros.append(logro["_id"])
+            current_user["logros"].append(ObjectId(logro["_id"]))
+            
+    if lista_logros:
+        db_client.Usuarios.update_one(
+            {"_id": current_user["_id"]},
+            {"$addToSet": {"logros": {"$each": lista_logros}}}
+        )  
 
-def logros_ranking_level(current_user):
+def logros_ranking_level(current_user:dict):
     """
     Función encargada de verificar si el usuario es uno de los primeros en llegar a un nivel
     y otorgarle el logro de ranking.
@@ -45,7 +75,7 @@ def logros_ranking_level(current_user):
         )
 
 
-def logros_nivel_usuario(current_user):
+def logros_nivel_usuario(current_user:dict):
     """
     Funcion encargada de obtener:
     el nivel del usuario.
@@ -59,7 +89,7 @@ def logros_nivel_usuario(current_user):
     otorgar_logro(current_user, logros_por_nivel_usuario, contador)
     return current_user
 
-def logros_puntos(current_user):
+def logros_puntos(current_user:dict):
     """
     Funcion encargada de obtener:
     los puntos totales de un usuario (stats).
@@ -70,7 +100,7 @@ def logros_puntos(current_user):
     otorgar_logro(current_user, logros_de_puntos, contador)
     return current_user
 
-def logros_preguntas(current_user):
+def logros_preguntas(current_user:dict):
     """
     Funcion encargada de cargar todos los logros de preguntas.
     """
