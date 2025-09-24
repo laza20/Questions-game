@@ -60,6 +60,7 @@ def insertar_question(preguntas: List[Question], current_user: Dict) -> List[Dic
         nuevos_documentos = list(coleccion.find({"_id": {"$in": resultado.inserted_ids}}))
         
     documentos = [_format_document(doc) for doc in nuevos_documentos]
+    service_conexion_logros.orquestador_logros(current_user, "pregunta_creada", documentos[0])
             
     return documentos
 
