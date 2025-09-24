@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 from db.models.logros import LogrosGenerales, LogrosUsuario, LogrosNames, LogrosGeneralesSinIds
+from db.models.usuario_player import LogrosMostrar
 from service import service_logros
 from fastapi import HTTPException, status, Body
 from fastapi import APIRouter, Depends
@@ -57,3 +58,20 @@ async def delete_achievement_by_id(id:str, current_user: dict = Depends(is_prime
     """
     End point encargado de eliminar un logro por medio de su id
     """
+    
+@router.get("/Ver/Logros/Simples/Usuario", response_model=LogrosMostrar, status_code=status.HTTP_202_ACCEPTED)
+async def view_achievement_user_names(current_user: dict = Depends(get_current_user)):
+    """
+    End point encargado de visualizar los logros de un usuario (solo nombres).
+    """
+    logros = service_logros.view_logros_user_names(current_user)
+    return logros
+
+
+@router.get("/Ver/Logros/Totales/Usuario", response_model=list[LogrosGeneralesSinIds], status_code=status.HTTP_202_ACCEPTED)
+async def view_achievement_user_names(id:str, current_user: dict = Depends(get_current_user)):
+    """
+    End point encargado de visualizar los logros de un usuario.
+    """
+    logros = service_logros.view_logros_user()
+    return logros
