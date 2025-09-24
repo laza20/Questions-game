@@ -120,6 +120,27 @@ def view_logros_user_names(current_user: Dict) -> Dict:
     
     return respuesta_final
 
+
+def view_logros_user(current_user: Dict) -> Dict:
+    """
+    Función encargada de obtener el nombre y descripción de los logros de un usuario.
+    """
+    logros_ids = current_user.get("logros", [])
+    
+    if not logros_ids:
+
+        return {
+            "logros": []
+        }
+
+    lista_logros_detalles = list(db_client.Logros.find({"_id": {"$in": logros_ids}}))
+    for logro in lista_logros_detalles:
+        logro["id"] = str(logro["_id"])
+        del logro["_id"]
+        logro["creador_id"] = str(logro["creador_id"])
+    
+    return lista_logros_detalles
+
 def _modificar_muchos_idscreador_a_nombre(logros):
     dict_logro = {}
     lista_logros_formateados = []
