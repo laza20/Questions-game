@@ -6,9 +6,44 @@ def orquestador_logros(current_user, evento, datos_evento):
     usuario_actualizado = db_client.Usuarios.find_one({"_id":current_user["_id"]})
     if evento == "pregunta_respondida":
         if datos_evento.get("respuesta_acertada") == "CORRECTA":
+            logros_ranking_level(usuario_actualizado)
             logros_preguntas(usuario_actualizado)
             logros_puntos(usuario_actualizado)
             logros_nivel_usuario(usuario_actualizado)
+
+def logros_ranking_level(current_user):
+    """
+    Función encargada de verificar si el usuario es uno de los primeros en llegar a un nivel
+    y otorgarle el logro de ranking.
+    """
+    logros_ranking = list(db_client.Logros.find({"condicion.tipo": "ranking_nivel"}))
+    user_logros_set = set(str(l) for l in current_user.get("logros", []))
+    logros_a_otorgar = []
+
+    for logro in logros_ranking:
+        nivel_requerido = logro["condicion"]["nivel"]
+        posicion_requerida = logro["condicion"]["posicion"]
+
+        if str(logro["_id"]) in user_logros_set:
+            continue
+
+        if current_user["stats"]["nivel"] >= nivel_requerido:
+            
+            usuarios_en_nivel = db_client.Usuarios.count_documents({
+                "stats.nivel": {"$gte": nivel_requerido}
+            })
+
+            if usuarios_en_nivel < posicion_requerida:
+                # Si es así, añade el logro a la lista
+                logros_a_otorgar.append(logro["_id"])
+                current_user["logros"].append(ObjectId(logro["_id"]))
+                
+    if logros_a_otorgar:
+        db_client.Usuarios.update_one(
+            {"_id": current_user["_id"]},
+            {"$addToSet": {"logros": {"$each": logros_a_otorgar}}}
+        )
+
 
 def logros_nivel_usuario(current_user):
     """
@@ -45,7 +80,7 @@ def logros_preguntas(current_user):
     for logro in logros:
         condicion = logro["condicion"]["tipo"]
         if logro["condicion"]["tipo"] != "maximo" and condicion != "preguntas_creadas":
-            if logro["_id"] not in user_logros and logro["condicion"]["valor"] <= current_user["progreso"][condicion]:
+            if str(logro["_id"]) not in user_logros and logro["condicion"]["valor"] <= current_user["progreso"][condicion]:
                 logros_nuevos.append(logro["_id"])
                 current_user["logros"].append(ObjectId(logro["_id"]))
 
