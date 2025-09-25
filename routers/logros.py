@@ -10,7 +10,7 @@ router = APIRouter(prefix="/Logros",
                    tags=["LOGROS"],
                    responses={404:{"Message":"No encontrado"}}
 )
-base_de_datos = "Categorias"
+base_de_datos = "Logros"
 
 @router.post("/Realizar/Carga", response_model=list[LogrosGenerales], status_code=status.HTTP_201_CREATED)
 async def crear_categorias_endpoint(logros: list[LogrosGenerales] = Body(...), current_user: dict = Depends(is_tercer_rango)):
