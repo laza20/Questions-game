@@ -3,6 +3,7 @@ from fastapi import HTTPException, status
 from db.client import db_client
 from typing import Dict, List
 from utils import funciones_logicas, graphlookups, funcion_nivel_pregunta
+from datetime import datetime, timezone
 
 
 def get_categoria_id(referencia_categoria: str):
@@ -15,7 +16,6 @@ def get_categoria_id(referencia_categoria: str):
         oid = ObjectId(referencia_categoria)
         # Si tiene éxito, busca por ID.
         documento = db_client.Categorias.find_one({"_id": oid})
-        print(documento)
         if not documento:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -195,6 +195,36 @@ def asignar_puntos_y_nivel(pregunta_elegida, respuesta):
     pregunta_elegida["nivel"] = funcion_nivel_pregunta.cargar_nivel_pregunta(pregunta_elegida["puntos_pregunta"])
     
     return pregunta_elegida, "CORRECTA" if es_correcta else "INCORRECTA"
+
+def actualizar_progreso(pregunta, current_user, nivel_pregunta):
+    id_categoria = get_categoria_id(pregunta["categoria_id"])
+    categoria_principal = identificar_categoria_con_graphlookup(id_categoria)
+    nombre_categoria = categoria_principal["nombre"]
+    
+    updates = {}
+    updates["progreso.preguntas_correctas"] = 1
+    
+    campo_categoria = f"progreso.preguntas_{nombre_categoria}_correctas"
+    updates[campo_categoria] = 1
+
+    campo_dificultad_normalizado = verificador_nivel(nivel_pregunta)
+    campo_dificultad_final = f"progreso.preguntas_{campo_dificultad_normalizado}_correctas"
+    updates[campo_dificultad_final] = 1
+    db_client.Usuarios.update_one(
+        {"_id": current_user["_id"]},
+        {"$inc": updates}
+    )
+
+
+def conformar_dict_preg_respondida(current_user, pregunta_elegida, respuesta, respuesta_acertada, puntos):
+    dict_pregunta_respondida = {}
+    dict_pregunta_respondida = {"id_usuario":current_user["_id"],
+        "id_pregunta"           : pregunta_elegida["_id"],
+        "respuesta_del_usuario" : respuesta["respuesta_correcta"],
+        "respuesta"             : respuesta_acertada,
+        "puntos_obtenidos"      : puntos,
+        "timestamp" : datetime.now(timezone.utc)}
+    return dict_pregunta_respondida
 
 def sin_usuario():
     raise HTTPException(

@@ -171,9 +171,9 @@ def play_question_by_category(categoria:str) -> Dict:
     
 def play_duel() -> Dict:
     """
-    Función que selecciona 10 preguntas aleatorias para un duelo.
+    Función que selecciona 3 preguntas aleatorias para un duelo.
     """
-    intentos_maximos = 100
+    intentos_maximos = 30
     intentos = 0
     preguntas = []
     while intentos < intentos_maximos:
@@ -201,7 +201,7 @@ def play_duel() -> Dict:
                 preguntas.append(pregunta_formateada)
             # No se necesita modificar categoria_id aquí, ya que el documento devuelto
             # por la pipeline ya es correcto.
-            if len(preguntas) == 10:
+            if len(preguntas) == 3:
                 return preguntas
         
         intentos += 1
@@ -272,7 +272,7 @@ def aswer_one_question(respuesta:dict, current_user:dict) -> Dict:
     nivel_pregunta = pregunta_elegida["nivel"]
     puntos_positivos, puntos_negativos = puntos_usuario_por_pregunta.puntos_por_nivel_pregunta(nivel_pregunta)
     if respuesta_acertada == "CORRECTA":
-        _actualizar_progreso(pregunta_elegida, current_user, nivel_pregunta)
+        db_helpers.actualizar_progreso(pregunta_elegida, current_user, nivel_pregunta)
         puntos_a_sumar = puntos_positivos 
         nivel = funcion_niveles_usuario.niveles_usuario(current_user["stats"]["puntos_xp"])
         updates = {
@@ -300,7 +300,7 @@ def aswer_one_question(respuesta:dict, current_user:dict) -> Dict:
     else:
         puntos = puntos_negativos
         
-    dict_pregunta_respondida = _conformar_dict_preg_respondida(current_user, pregunta_elegida, respuesta, respuesta_acertada, puntos)
+    dict_pregunta_respondida = db_helpers.conformar_dict_preg_respondida(current_user, pregunta_elegida, respuesta, respuesta_acertada, puntos)
     
     db_client.Preguntas_respondidas.insert_one(dict_pregunta_respondida).inserted_id
     usuario_formateado = db_helpers.transformar_id_documento(usuario_modificado)
@@ -334,36 +334,7 @@ def _validate_question(dato: Question):
     
     return dato.nivel
 
-def _actualizar_progreso(pregunta, current_user, nivel_pregunta):
-    id_categoria = db_helpers.get_categoria_id(pregunta["categoria_id"])
-    categoria_principal = db_helpers.identificar_categoria_con_graphlookup(id_categoria)
-    nombre_categoria = categoria_principal["nombre"]
-    
-    updates = {}
-    updates["progreso.preguntas_correctas"] = 1
-    
-    campo_categoria = f"progreso.preguntas_{nombre_categoria}_correctas"
-    updates[campo_categoria] = 1
 
-    campo_dificultad_normalizado = db_helpers.verificador_nivel(nivel_pregunta)
-    campo_dificultad_final = f"progreso.preguntas_{campo_dificultad_normalizado}_correctas"
-    updates[campo_dificultad_final] = 1
-    db_client.Usuarios.update_one(
-        {"_id": current_user["_id"]},
-        {"$inc": updates}
-    )
-
-
-
-def _conformar_dict_preg_respondida(current_user, pregunta_elegida, respuesta, respuesta_acertada, puntos):
-    dict_pregunta_respondida = {}
-    dict_pregunta_respondida = {"id_usuario":current_user["_id"],
-        "id_pregunta"           : pregunta_elegida["_id"],
-        "respuesta_del_usuario" : respuesta["respuesta_correcta"],
-        "respuesta"             : respuesta_acertada,
-        "puntos_obtenidos"      : puntos,
-        "timestamp" : datetime.now(timezone.utc)}
-    return dict_pregunta_respondida
         
 def _verificar_respuesta_correcta(dato: Question):
     """Funcion que verifica que la respuesta correcta esta entre las opciones proporcionadas."""
