@@ -18,7 +18,8 @@ class RondaDuelo(BaseModel):
 class Duelo(BaseModel):
     id                          : Optional[str] = None
     usuario_uno_id              : str
-    usuario_dos_id              : str
+    usuario_dos_id              : Optional[str] = None
+    numero_de_ronda             : Optional[int] = 0
     rondas_usuario_uno          : List[RondaDuelo] = Field(default_factory=list)
     rondas_usuario_dos          : List[RondaDuelo] = Field(default_factory=list)
     puntos_finales_usuario_uno  : Optional[int] = None
