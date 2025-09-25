@@ -17,7 +17,6 @@ def iniciar_duelo(current_user:dict) -> Dict:
     
     id = db_client.Duelos.insert_one(duelo).inserted_id
     nuevo_duelo = db_client.Duelos.find_one({"_id": id})
-    print(nuevo_duelo)
     duelo_transformado = _transformar_id(nuevo_duelo)
     return duelo_transformado
     
