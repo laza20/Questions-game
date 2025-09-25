@@ -2,11 +2,14 @@ from datetime import datetime, timezone
 from typing import List, Optional
 from pydantic import BaseModel, Field
 
-class PreguntasRonda(BaseModel):
+class PreguntasUnitaria(BaseModel):
     pregunta_id       : str
     respuesta_correcta: bool
     puntos_pregunta   : int
     nivel_pregunta    : str
+    
+class PreguntasRonda(BaseModel):
+    pregunta : List[PreguntasUnitaria] = Field(default_factory=list)
 
 # Representa una sola ronda dentro de un duelo
 class RondaDuelo(BaseModel):
