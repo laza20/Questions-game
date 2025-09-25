@@ -8,7 +8,8 @@ from routers import (
     questions,
     usuarios,
     preguntas_respondidas_user,
-    logros
+    logros,
+    duelos
 )
 from dependencies import auth_dependencies
 
@@ -21,3 +22,4 @@ app.include_router(usuarios.router)
 app.include_router(auth_dependencies.router)
 app.include_router(preguntas_respondidas_user.router)
 app.include_router(logros.router)
+app.include_router(duelos.router)
